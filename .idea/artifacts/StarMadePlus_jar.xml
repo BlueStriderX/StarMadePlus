@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact name="StarMadePlus:jar">
+    <output-path>$PROJECT_DIR$/../../Game Files/StarMade Modded/StarMade/mods</output-path>
+    <root id="root">
+      <element id="archive" name="StarMadePlus.jar">
+        <element id="module-output" name="StarMadePlus" />
+      </element>
+    </root>
+  </artifact>
+</component>
