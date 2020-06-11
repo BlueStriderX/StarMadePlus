@@ -4,3 +4,5 @@
 /.idea/*
 /out
 /.idea
+out/production/StarMadePlus/net/dovtech/starmadeplus/StarMadePlus$1.class
+*.class
