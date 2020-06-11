@@ -74,7 +74,9 @@ public class StarMadePlus extends StarMod {
                         bleedthrough = 1.0 - (hitShield.getInternalShield().getShields() / hitShield.getInternalShield().getShieldCapacity());
                     }
 
-                    double bleedthroughDamage = (event.getDamage() * bleedthrough) - (bleedthroughNerf * event.getDamage());
+                    double damage = event.getProjectile().getDamage(0);
+
+                    double bleedthroughDamage = (damage * bleedthrough) - (bleedthroughNerf * damage);
                     event.getShotHandler().dmg = (float) bleedthroughDamage;
                     if(debug) DebugFile.log("[DEBUG]: Bleedthrough damage is " + bleedthroughDamage, this.getMod());
                     for(Segment segment : event.getShotHandler().segmentsHit) {
@@ -105,7 +107,7 @@ public class StarMadePlus extends StarMod {
     }
 
     private void changeConfig() throws IOException {
-        File blockBehaviorConfigfile = new File("/data/config/blockBehaviorConfig.xml");
+        File blockBehaviorConfigfile = new File("data" + File.separator + "data" + File.separator + "blockBehaviorConfig.xml");
         FileUtils.copyURLToFile(this.getClass().getResource("/blockBehaviorConfig.xml"), blockBehaviorConfigfile);
     }
 
