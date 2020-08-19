@@ -1,7 +1,6 @@
 package dovtech.starmadeplus.gui.faction.relations;
 
 import dovtech.starmadeplus.StarMadePlus;
-import dovtech.starmadeplus.faction.diplo.alliance.pact.FactionPact;
 import dovtech.starmadeplus.faction.diplo.relations.FactionRelations;
 import org.schema.game.client.view.gui.faction.FactionRelationEditPanel;
 import org.schema.game.common.data.player.faction.Faction;

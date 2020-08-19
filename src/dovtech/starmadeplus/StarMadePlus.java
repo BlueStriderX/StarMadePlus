@@ -36,8 +36,12 @@ public class StarMadePlus extends StarMod {
 
     static StarMadePlus inst;
 
+    public StarMadePlus() {
+        inst = this;
+    }
+
     //Resources
-    private String resourcesPath = this.getClass().getResource("/../../resources").getPath();
+    private String resourcesPath;
 
     //Server
     private File factionStatsFolder;
@@ -67,26 +71,11 @@ public class StarMadePlus extends StarMod {
     @Override
     public void onGameStart() {
         inst = this;
+        resourcesPath = inst.getClass().getResource("/resources").getPath();
         setModName("StarMadePlus");
         setModAuthor("Dovtech");
         setModVersion("0.1.10");
         setModDescription("Improves faction interaction and diplomacy.");
-    }
-
-    @Override
-    public void onEnable() {
-        super.onEnable();
-        DebugFile.log("Enabled", this);
-
-        this.factionStatsFolder = new File("../moddata/StarMadePlus/stats/factions");
-        this.factionPactsFolder = new File("../moddata/StarMadePlus/stats/pacts");
-        if(!factionStatsFolder.exists()) factionStatsFolder.mkdirs();
-        if(!factionPactsFolder.exists()) factionPactsFolder.mkdirs();
-
-        this.factionStats = new HashMap<>();
-        this.coalitions = new HashMap<>();
-        this.relations = new HashMap<>();
-        this.factionPacts = new HashMap<>();
 
         initConfig();
         if(GameClient.getClientState() == null) {
@@ -97,7 +86,24 @@ public class StarMadePlus extends StarMod {
                 e.printStackTrace();
             }
         }
+
         registerListeners();
+    }
+
+    @Override
+    public void onEnable() {
+        super.onEnable();
+        DebugFile.log("Enabled", this);
+
+        this.factionStatsFolder = new File("../moddata/StarMadePlus/factions");
+        this.factionPactsFolder = new File("../moddata/StarMadePlus/pacts");
+        if(!factionStatsFolder.exists()) factionStatsFolder.mkdirs();
+        if(!factionPactsFolder.exists()) factionPactsFolder.mkdirs();
+
+        this.factionStats = new HashMap<>();
+        this.coalitions = new HashMap<>();
+        this.relations = new HashMap<>();
+        this.factionPacts = new HashMap<>();
     }
 
     @Override
@@ -121,7 +127,6 @@ public class StarMadePlus extends StarMod {
                             GameClientState state = factionControlManager.getState();
                             factionControlManagerField.set(playerGameControlManager, new NewFactionControlManager(state));
                             if(debugMode)DebugFile.log("[DEBUG]: Swapped out FactionControlManager", getMod());
-
                         }
                     } catch(NoSuchFieldException | IllegalAccessException | NullPointerException ex) {
                         ex.printStackTrace();

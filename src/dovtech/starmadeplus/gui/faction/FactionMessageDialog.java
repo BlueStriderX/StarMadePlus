@@ -2,7 +2,6 @@ package dovtech.starmadeplus.gui.faction;
 
 import dovtech.starmadeplus.faction.diplo.relations.FactionMessage;
 import org.schema.game.client.view.gui.GUIInputPanel;
-import org.schema.game.client.view.gui.mail.GUICreateMailPanel;
 import org.schema.game.common.data.player.faction.Faction;
 import org.schema.schine.common.OnInputChangedCallback;
 import org.schema.schine.common.TextCallback;
