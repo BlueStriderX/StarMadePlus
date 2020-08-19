@@ -30,15 +30,11 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class StarMadePlus extends StarMod {
 
     static StarMadePlus inst;
-    public StarMadePlus() {
-        inst = this;
-    }
 
     //Resources
     private String resourcesPath = this.getClass().getResource("/../../resources").getPath();
@@ -70,6 +66,7 @@ public class StarMadePlus extends StarMod {
 
     @Override
     public void onGameStart() {
+        inst = this;
         setModName("StarMadePlus");
         setModAuthor("Dovtech");
         setModVersion("0.1.10");
@@ -122,7 +119,7 @@ public class StarMadePlus extends StarMod {
                         FactionControlManager factionControlManager = (FactionControlManager) factionControlManagerField.get(playerGameControlManager);
                         if(!(factionControlManager instanceof NewFactionControlManager)) {
                             GameClientState state = factionControlManager.getState();
-                            factionControlManagerField.set(factionControlManager, new NewFactionControlManager(state));
+                            factionControlManagerField.set(playerGameControlManager, new NewFactionControlManager(state));
                             if(debugMode)DebugFile.log("[DEBUG]: Swapped out FactionControlManager", getMod());
 
                         }
