@@ -32,7 +32,7 @@ public class NewFactionRelationEditPanel extends FactionRelationEditPanel {
         this.fromRelations = StarMadePlus.getInstance().getRelationsTo(from, to);
         this.toRelations = StarMadePlus.getInstance().getRelationsTo(to, from);
 
-        this.opinionModButtonSprite = new Sprite(new Texture(0, fromRelations.getDisplay().spriteID, StarMadePlus.getInstance().getResourcesPath() + "/gui/faction-buttons"));
+        this.opinionModButtonSprite = new Sprite(new Texture(0, fromRelations.getDisplay().spriteID, StarMadePlus.getInstance().getResourcesPath() + "/resources/gui/faction-buttons"));
     }
 
     @Override

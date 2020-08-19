@@ -41,7 +41,7 @@ public class StarMadePlus extends StarMod {
     }
 
     //Resources
-    private String resourcesPath;
+    private String resourcesPath = "/resources";
 
     //Server
     private File factionStatsFolder;
@@ -71,7 +71,6 @@ public class StarMadePlus extends StarMod {
     @Override
     public void onGameStart() {
         inst = this;
-        resourcesPath = inst.getClass().getResource("/resources").getPath();
         setModName("StarMadePlus");
         setModAuthor("Dovtech");
         setModVersion("0.1.10");
