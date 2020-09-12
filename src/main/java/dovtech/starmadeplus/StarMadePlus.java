@@ -44,6 +44,8 @@ public class StarMadePlus extends StarMod {
     private String resourcesPath = "/resources";
 
     //Server
+    private File moddataFolder;
+    private File StarMadePlusDataFolder;
     private File factionStatsFolder;
     private File factionPactsFolder;
     private HashMap<Faction, FactionStats> factionStats;
@@ -76,8 +78,18 @@ public class StarMadePlus extends StarMod {
         setModVersion("0.1.10");
         setModDescription("Improves faction interaction and diplomacy.");
 
+        moddataFolder = new File("moddata");
+        if(!moddataFolder.exists()) moddataFolder.mkdir();
+        StarMadePlusDataFolder = new File("moddata/StarMadePlus");
+        if(!StarMadePlusDataFolder.exists()) StarMadePlusDataFolder.mkdir();
+
+        factionStatsFolder = new File("moddata/StarMadePlus/factions");
+        factionPactsFolder = new File("moddata/StarMadePlus/pacts");
+        if(!(factionStatsFolder.exists())) factionStatsFolder.mkdir();
+        if(!(factionPactsFolder.exists())) factionPactsFolder.mkdir();
+
         initConfig();
-        if(GameClient.getClientState() == null) {
+        if(GameClient.getClientState() != null) {
             try {
                 loadFactionStats();
                 loadFactionPacts();
@@ -94,10 +106,6 @@ public class StarMadePlus extends StarMod {
         super.onEnable();
         DebugFile.log("Enabled", this);
 
-        this.factionStatsFolder = new File("../moddata/StarMadePlus/factions");
-        this.factionPactsFolder = new File("../moddata/StarMadePlus/pacts");
-        if(!factionStatsFolder.exists()) factionStatsFolder.mkdirs();
-        if(!factionPactsFolder.exists()) factionPactsFolder.mkdirs();
 
         this.factionStats = new HashMap<>();
         this.coalitions = new HashMap<>();
@@ -111,13 +119,13 @@ public class StarMadePlus extends StarMod {
     }
 
     private void registerListeners() {
-
         StarLoader.registerListener(ControlManagerActivateEvent.class, new Listener<ControlManagerActivateEvent>() {
             @Override
             public void onEvent(ControlManagerActivateEvent event) {
-                PlayerGameControlManager playerGameControlManager = GameClientState.instance.getGlobalGameControlManager().getIngameControlManager().getPlayerGameControlManager();
-                if(event.isActive()) {
+                if(event.isActive() && event.getControlManager() instanceof PlayerGameControlManager) {
                     try {
+                        PlayerGameControlManager playerGameControlManager = (PlayerGameControlManager) event.getControlManager();
+
                         //NewFactionControlManager
                         Field factionControlManagerField = PlayerGameControlManager.class.getDeclaredField("factionControlManager");
                         factionControlManagerField.setAccessible(true);
@@ -256,7 +264,7 @@ public class StarMadePlus extends StarMod {
     }
 
     private void loadFactionStats() throws FileNotFoundException {
-        if(!(Objects.requireNonNull(factionStatsFolder.listFiles()).length > 0)) {
+        if(Objects.requireNonNull(factionStatsFolder.listFiles()).length > 0) {
             for(File factionFile : Objects.requireNonNull(factionStatsFolder.listFiles())) {
                 String factionID = factionFile.getName().substring(0, factionFile.getName().indexOf(".smdat") - 1);
                 Faction faction = GameServerState.instance.getFactionManager().getFaction(Integer.parseInt(factionID));
@@ -274,7 +282,7 @@ public class StarMadePlus extends StarMod {
     }
 
     private void loadFactionPacts() throws FileNotFoundException {
-        if(!(Objects.requireNonNull(factionPactsFolder.listFiles()).length > 0)) {
+        if(Objects.requireNonNull(factionPactsFolder.listFiles()).length > 0) {
             for(File pactFile : Objects.requireNonNull(factionPactsFolder.listFiles())) {
                 String pactID = pactFile.getName().substring(0, pactFile.getName().indexOf(".smdat") - 1);
                 Scanner scan = new Scanner(pactFile);
@@ -330,7 +338,7 @@ public class StarMadePlus extends StarMod {
         }
         FileWriter output = new FileWriter(factionFile.getPath());
         for(int i = 0; i < fStats.getStats().length; i ++) {
-            output.write(fStats.getStats()[i]);
+            output.write(String.valueOf(fStats.getStats()[i]));
         }
         output.close();
     }

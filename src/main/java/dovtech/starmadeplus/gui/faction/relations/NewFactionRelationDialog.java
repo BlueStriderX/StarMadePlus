@@ -12,7 +12,7 @@ public class NewFactionRelationDialog extends FactionRelationDialog {
 
     private Faction from;
     private Faction to;
-    private NewFactionRelationEditPanel relationEditPanel;
+    private dovtech.starmadeplus.gui.faction.relations.NewFactionRelationEditPanel relationEditPanel;
 
     public NewFactionRelationDialog(GameClientState state, Faction from, Faction to) {
         super(state, from, to);

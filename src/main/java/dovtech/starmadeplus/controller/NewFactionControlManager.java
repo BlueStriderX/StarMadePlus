@@ -2,6 +2,9 @@ package dovtech.starmadeplus.controller;
 
 import dovtech.starmadeplus.gui.faction.relations.NewFactionRelationDialog;
 import org.schema.game.client.controller.manager.ingame.faction.FactionControlManager;
+import org.schema.game.client.controller.manager.ingame.faction.FactionHubControlManager;
+import org.schema.game.client.controller.manager.ingame.faction.LocalFactionControlManager;
+import org.schema.game.client.controller.manager.ingame.faction.PersonalFactionControlManager;
 import org.schema.game.client.data.GameClientState;
 import org.schema.game.common.data.player.faction.Faction;
 import org.schema.game.common.data.player.faction.FactionPermission;
@@ -9,8 +12,23 @@ import org.schema.schine.common.language.Lng;
 
 public class NewFactionControlManager extends FactionControlManager {
 
+    private PersonalFactionControlManager personalFactionControlManager;
+    private FactionHubControlManager factionHubControlManager;
+    private LocalFactionControlManager localFactionControlManager;
+
     public NewFactionControlManager(GameClientState gameClientState) {
         super(gameClientState);
+        this.initialize();
+    }
+
+    private void initialize() {
+        this.personalFactionControlManager = new PersonalFactionControlManager(this.getState());
+        this.factionHubControlManager = new FactionHubControlManager(this.getState());
+        this.localFactionControlManager = new LocalFactionControlManager(this.getState());
+        this.getControlManagers().add(this.personalFactionControlManager);
+        this.getControlManagers().add(this.factionHubControlManager);
+        this.getControlManagers().add(this.localFactionControlManager);
+        this.personalFactionControlManager.setActive(true);
     }
 
     @Override

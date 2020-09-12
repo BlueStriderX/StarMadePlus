@@ -16,7 +16,7 @@ public class NewFactionRelationEditPanel extends FactionRelationEditPanel {
 
     private final Faction from;
     private final Faction to;
-    private final NewFactionRelationDialog dialog;
+    private final dovtech.starmadeplus.gui.faction.relations.NewFactionRelationDialog dialog;
     private FactionRelations fromRelations;
     private FactionRelations toRelations;
 
@@ -32,7 +32,7 @@ public class NewFactionRelationEditPanel extends FactionRelationEditPanel {
         this.fromRelations = StarMadePlus.getInstance().getRelationsTo(from, to);
         this.toRelations = StarMadePlus.getInstance().getRelationsTo(to, from);
 
-        this.opinionModButtonSprite = new Sprite(new Texture(0, fromRelations.getDisplay().spriteID, StarMadePlus.getInstance().getResourcesPath() + "/resources/gui/faction-buttons"));
+        this.opinionModButtonSprite = new Sprite(new Texture(0, fromRelations.getDisplay().spriteID, StarMadePlus.getInstance().getResourcesPath() + "/gui/faction-buttons"));
     }
 
     @Override
