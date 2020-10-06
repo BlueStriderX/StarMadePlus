@@ -42,7 +42,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../starloader/out/artifacts/starloader_jar/starloader.jar!/" />
+          <root url="jar://$MODULE_DIR$/../starloader/build/libs/starloader.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
