@@ -41,7 +41,7 @@ public class StarMadePlus extends StarMod {
     private String[] defaultConfig = {
             "debug-mode: false",
             "image-filter-mode: blacklist",
-            "image-filter: porn, hentai, sex, nsfw"
+            "image-filter: porn,hentai,sex,nsfw"
     };
     public boolean debugMode = false;
     public ImageFilterMode imageFilterMode = ImageFilterMode.BLACKLIST;
@@ -57,7 +57,7 @@ public class StarMadePlus extends StarMod {
     @Override
     public void onGameStart() {
         setModName("StarMadePlus");
-        setModVersion("0.3.2");
+        setModVersion("0.3.3");
         setModAuthor("Dovtech");
         setModDescription("Minor tweaks and additions to improve the base game.");
     }
