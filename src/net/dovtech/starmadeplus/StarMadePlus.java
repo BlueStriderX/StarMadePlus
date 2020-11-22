@@ -85,7 +85,7 @@ public class StarMadePlus extends StarMod {
     @Override
     public void onGameStart() {
         setModName("StarMadePlus");
-        setModVersion("0.3.5");
+        setModVersion("0.3.6");
         setModAuthor("Dovtech");
         setModDescription("Minor tweaks and additions to improve the base game.");
     }

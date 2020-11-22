@@ -2,6 +2,7 @@ package net.dovtech.starmadeplus.listener;
 
 import api.listener.fastevents.TextBoxDrawListener;
 import api.utils.textures.StarLoaderTexture;
+import com.bulletphysics.linearmath.Transform;
 import net.dovtech.starmadeplus.StarMadePlus;
 import net.dovtech.starmadeplus.image.ImageManager;
 import net.dovtech.starmadeplus.image.ScalableImageSubSprite;
@@ -10,7 +11,9 @@ import org.schema.game.client.view.SegmentDrawer;
 import org.schema.game.client.view.textbox.AbstractTextBox;
 import org.schema.schine.graphicsengine.core.Controller;
 import org.schema.schine.graphicsengine.forms.Sprite;
+
 import javax.imageio.ImageIO;
+import javax.vecmath.Vector3f;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
@@ -46,11 +49,9 @@ public class TextDrawListener implements TextBoxDrawListener {
                 String src = null;
                 boolean hideText = true;
                 float scale = 1.0f;
-                /*
                 float xOffset = 0.0f;
                 float yOffset = 0.0f;
                 float zOffset = 0.0f;
-                 */
                 try {
                     for (String arg : args) {
                         if (arg.startsWith("src=")) {
@@ -59,25 +60,22 @@ public class TextDrawListener implements TextBoxDrawListener {
                             scale = Math.min(StarMadePlus.getInstance().maxImageScale, Float.parseFloat(arg.split("scale=")[1]));
                         } else if (arg.startsWith("hide_text=")) {
                             hideText = Boolean.parseBoolean(arg.split("hide_text=")[1]);
+                        } else if (arg.startsWith("x=")) {
+                            xOffset = Math.min(StarMadePlus.getInstance().maxImageOffset, Float.parseFloat(arg.split("x=")[1]));
+                        } else if (arg.startsWith("y=")) {
+                            yOffset = Math.min(StarMadePlus.getInstance().maxImageOffset, Float.parseFloat(arg.split("y=")[1]));
+                        } else if (arg.startsWith("z=")) {
+                            zOffset = Math.min(StarMadePlus.getInstance().maxImageOffset, Float.parseFloat(arg.split("z=")[1]));
                         }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                        /*
-                    } else if (arg.startsWith("x=")) {
-                        xOffset = Math.min(StarMadePlus.getInstance().maxImageOffset, Float.parseFloat(arg.split("x=")[1]));
-                    } else if (arg.startsWith("y=")) {
-                        yOffset = Math.min(StarMadePlus.getInstance().maxImageOffset, Float.parseFloat(arg.split("y=")[1]));
-                    } else if (arg.startsWith("z=")) {
-                        zOffset = Math.min(StarMadePlus.getInstance().maxImageOffset, Float.parseFloat(arg.split("z=")[1]));
-                    }
-                         */
                 if (scale <= 0) scale = 1.0f;
 
                 scale = (scale / 100) * -1; //Fix scaling
 
-                if(hideText) {
+                if (hideText) {
                     textBoxElement.text.setTextSimple("");
                 }
 
@@ -91,7 +89,7 @@ public class TextDrawListener implements TextBoxDrawListener {
                                 break;
                             }
                         }
-                    } else {
+                    } else if (StarMadePlus.getInstance().imageFilterMode.equals(StarMadePlus.ImageFilterMode.WHITELIST)) {
                         blockImage = true;
                         for (String s : StarMadePlus.getInstance().imageFilter) {
                             if (src.toLowerCase().contains(s.toLowerCase())) {
@@ -104,8 +102,13 @@ public class TextDrawListener implements TextBoxDrawListener {
                     if (!blockImage) {
                         Sprite image = ImageManager.getImage(src);
                         if (image != null) {
-                            ScalableImageSubSprite[] subSprite = new ScalableImageSubSprite[]{new ScalableImageSubSprite(scale, textBoxElement.worldpos)};
-                            //subSprite[0].getWorldTransform().transform(new Vector3f(xOffset, yOffset, zOffset));
+                            Vector3f newPos = new Vector3f(xOffset, yOffset, zOffset);
+                            Transform newTransform = textBoxElement.worldpos;
+                            newTransform.transform(newPos);
+                            newTransform.origin.x = newTransform.origin.x + xOffset;
+                            newTransform.origin.y = newTransform.origin.y + yOffset;
+                            newTransform.origin.z = newTransform.origin.z + zOffset;
+                            ScalableImageSubSprite[] subSprite = new ScalableImageSubSprite[]{new ScalableImageSubSprite(scale, newTransform)};
                             Sprite.draw3D(image, subSprite, 1, Controller.getCamera());
                         }
                     }
