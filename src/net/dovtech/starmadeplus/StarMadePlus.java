@@ -16,9 +16,11 @@ import api.mod.StarLoader;
 import api.mod.StarMod;
 import api.mod.config.FileConfiguration;
 import api.mod.config.PersistentObjectUtil;
+import api.utils.textures.StarLoaderTexture;
 import net.dovtech.starmadeplus.blocks.*;
 import net.dovtech.starmadeplus.listener.RailMoveEvent;
 import net.dovtech.starmadeplus.listener.TextDrawEvent;
+import org.newdawn.slick.Image;
 import org.schema.game.client.controller.PlayerOkCancelInput;
 import org.schema.game.client.controller.PlayerTextAreaInput;
 import org.schema.game.client.controller.element.world.ClientSegmentProvider;
@@ -37,12 +39,16 @@ import org.schema.schine.graphicsengine.core.Controller;
 import org.schema.schine.graphicsengine.core.GLFrame;
 import org.schema.schine.graphicsengine.core.settings.PrefixNotFoundException;
 import org.schema.schine.graphicsengine.forms.font.FontLibrary;
+
+import javax.imageio.ImageIO;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Objects;
 
 public class StarMadePlus extends StarMod {
@@ -56,6 +62,7 @@ public class StarMadePlus extends StarMod {
 
     public enum LogType {DEBUG, INFO, WARNING, ERROR, SEVERE}
 
+    public HashMap<String, StarLoaderTexture> textures = new HashMap<>();
     private final String disclaimerMessage =
             "By pressing the ACCEPT button, you hereby acknowledge any and all responsibility for the images you\n" +
                     "post and that the creators of StarMadePlus, the StarLoader team, Schine, the Server or its owners,\n" +
@@ -114,6 +121,7 @@ public class StarMadePlus extends StarMod {
         registerFastListeners();
         registerListeners();
         loadBlockModels();
+        loadTextures();
         if (getGameState().equals(GameMode.SERVER) || getGameState().equals(GameMode.SINGLEPLAYER)) {
             initConfig();
             createLogs();
@@ -374,22 +382,30 @@ public class StarMadePlus extends StarMod {
 
     private void loadBlockModels() {
         try {
-            File modelsFolder = new File(StarMadePlus.class.getResource("/net/dovtech/starmadeplus/resource/models").getFile());
-            if(modelsFolder.exists()) {
-                for(File modelFile : Objects.requireNonNull(modelsFolder.listFiles())) {
-                    if(modelFile.isDirectory()) {
-                        File destinationFile = new File("/data/models/mods/StarMadePlus/" + modelFile.getName());
-                        if(!destinationFile.exists()) {
-                            destinationFile.mkdirs();
-                            FileUtil.copyFile(modelFile, destinationFile);
-                        }
-                        Controller.getResLoader().loadModelDirectly(modelFile.getName(), "/models/mods/StarMadePlus/" + modelFile.getName(), modelFile.getName() + ".mesh");
-                    }
-                }
-            } else {
-                DebugFile.log("[ERROR]: Could not locate models directory!", this);
-                if(debugMode) DebugFile.log("[DEBUG]: Path evaluated to " + modelsFolder.getPath());
-            }
+            String modelsFolder = "resource/models/";
+            Controller.getResLoader().loadModelDirectly("DisplayScreen", StarMadePlus.class.getResource(modelsFolder + "DisplayScreen").getPath(), "DisplayScreen");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadTextures() {
+        try {
+            String texturesFolder = "resource/textures/blocks/";
+
+            textures.put("hidden-rail-spinner-clockwise_sides", StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream(texturesFolder + "hidden-rail-spinner-clockwise_sides.png"))));
+            textures.put("hidden-rail-spinner-clockwise_top", StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream(texturesFolder + "hidden-rail-spinner-clockwise_top.png"))));
+
+            textures.put("hidden-rail-spinner-counterclockwise_sides", StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream(texturesFolder + "hidden-rail-spinner-counterclockwise_sides.png"))));
+            textures.put("hidden-rail-spinner-counterclockwise_top", StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream(texturesFolder + "hidden-rail-spinner-counterclockwise_top.png"))));
+
+            textures.put("rail-spinner-clockwise_bottom", StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream(texturesFolder + "rail-spinner-clockwise_bottom.png"))));
+            textures.put("rail-spinner-clockwise_sides", StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream(texturesFolder + "rail-spinner-clockwise_sides.png"))));
+            textures.put("rail-spinner-clockwise_top", StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream(texturesFolder + "rail-spinner-clockwise_top.png"))));
+
+            textures.put("rail-spinner-counterclockwise_bottom", StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream(texturesFolder + "rail-spinner-counterclockwise_bottom.png"))));
+            textures.put("rail-spinner-counterclockwise_sides", StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream(texturesFolder + "rail-spinner-counterclockwise_sides.png"))));
+            textures.put("rail-spinner-counterclockwise_top", StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream(texturesFolder + "rail-spinner-counterclockwise_top.png"))));
         } catch (Exception e) {
             e.printStackTrace();
         }

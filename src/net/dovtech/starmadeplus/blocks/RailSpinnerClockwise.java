@@ -7,7 +7,7 @@ import org.schema.game.common.data.element.FactoryResource;
 public class RailSpinnerClockwise extends BlockElement {
 
     public RailSpinnerClockwise(BlockConfig config) {
-        super(config, "Rail Spinner Clockwise", BlockManager.BlockSide.TOP_BOTTOM);
+        super(config, "Rail Spinner Clock Wise", BlockManager.BlockSide.TOP_BOTTOM);
         blockInfo.setInRecipe(true);
         blockInfo.canActivate = false;
         blockInfo.setPrice(Blocks.RAIL_ROTATOR_CLOCK_WISE.getInfo().price);

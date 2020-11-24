@@ -17,8 +17,8 @@ public abstract class BlockElement {
             try {
                 int index;
                 for (index = 0; index < textureSides.length; index ++) {
-                    String textureName = name.toLowerCase().replaceAll(" ", "-") + "_" + textureSides[index].name().toLowerCase() + ".png";
-                    StarLoaderTexture texture = StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream("resource/textures/blocks/" + textureName)));
+                    String textureName = name.toLowerCase().replaceAll(" ", "-") + "_" + textureSides[index].name().toLowerCase();
+                    StarLoaderTexture texture = StarMadePlus.getInstance().textures.get(textureName);
                     textureIDs[index] = (short) texture.getTextureId();
                 }
             } catch (Exception e) {
@@ -26,8 +26,8 @@ public abstract class BlockElement {
             }
         } else if(textureSides.length == 1 && textureSides[0] == BlockManager.BlockSide.ALL) {
             try {
-                String textureName = name.toLowerCase().replaceAll(" ", "-") + ".png";
-                StarLoaderTexture texture = StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream("resource/textures/blocks/" + textureName)));
+                String textureName = name.toLowerCase().replaceAll(" ", "-");
+                StarLoaderTexture texture = StarMadePlus.getInstance().textures.get(textureName);
                 short textureID = (short) texture.getTextureId();
                 textureIDs = new short[] {textureID, textureID, textureID, textureID, textureID, textureID};
             } catch (Exception e) {
@@ -35,11 +35,11 @@ public abstract class BlockElement {
             }
         } else if (textureSides.length == 1 && textureSides[0] == BlockManager.BlockSide.TOP_ONLY) {
                 try {
-                    String topName = name.toLowerCase().replaceAll(" ", "-") + "_top.png";
-                    String sidesName = name.toLowerCase().replaceAll(" ", "-") + "_sides.png";
+                    String topName = name.toLowerCase().replaceAll(" ", "-") + "_top";
+                    String sidesName = name.toLowerCase().replaceAll(" ", "-") + "_sides";
 
-                    StarLoaderTexture topTexture = StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream("resource/textures/blocks/" + topName)));
-                    StarLoaderTexture sidesTexture = StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream("resource/textures/blocks/" + sidesName)));
+                    StarLoaderTexture topTexture =  StarMadePlus.getInstance().textures.get(topName);
+                    StarLoaderTexture sidesTexture = StarMadePlus.getInstance().textures.get(sidesName);
 
                     textureIDs[0] = (short) sidesTexture.getTextureId();
                     textureIDs[1] = (short) sidesTexture.getTextureId();
@@ -52,13 +52,13 @@ public abstract class BlockElement {
                 }
         } else if(textureSides.length == 1 && textureSides[0] == BlockManager.BlockSide.TOP_BOTTOM) {
             try {
-                String topName = name.toLowerCase().replaceAll(" ", "-") + "_top.png";
-                String bottomName = name.toLowerCase().replaceAll(" ", "-") + "_bottom.png";
-                String sidesName = name.toLowerCase().replaceAll(" ", "-") + "_sides.png";
+                String topName = name.toLowerCase().replaceAll(" ", "-") + "_top";
+                String bottomName = name.toLowerCase().replaceAll(" ", "-") + "_bottom";
+                String sidesName = name.toLowerCase().replaceAll(" ", "-") + "_sides";
 
-                StarLoaderTexture topTexture = StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream("resource/textures/blocks/" + topName)));
-                StarLoaderTexture bottomTexture = StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream("resource/textures/blocks/" + bottomName)));
-                StarLoaderTexture sidesTexture = StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream("resource/textures/blocks/" + sidesName)));
+                StarLoaderTexture topTexture = StarMadePlus.getInstance().textures.get(topName);
+                StarLoaderTexture bottomTexture = StarMadePlus.getInstance().textures.get(bottomName);
+                StarLoaderTexture sidesTexture = StarMadePlus.getInstance().textures.get(sidesName);
 
                 textureIDs[0] = (short) sidesTexture.getTextureId();
                 textureIDs[1] = (short) sidesTexture.getTextureId();

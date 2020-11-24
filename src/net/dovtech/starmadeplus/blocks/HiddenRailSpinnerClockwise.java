@@ -7,7 +7,7 @@ import org.schema.game.common.data.element.FactoryResource;
 public class HiddenRailSpinnerClockwise extends BlockElement {
 
     public HiddenRailSpinnerClockwise(BlockConfig config) {
-        super(config, "Hidden Rail Spinner Clockwise", BlockManager.BlockSide.TOP_ONLY);
+        super(config, "Hidden Rail Spinner Clock Wise", BlockManager.BlockSide.TOP_ONLY);
         blockInfo.setInRecipe(true);
         blockInfo.canActivate = false;
         blockInfo.setPrice(Blocks.RAIL_ROTATOR_CLOCK_WISE.getInfo().price);

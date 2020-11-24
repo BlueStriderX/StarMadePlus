@@ -11,10 +11,10 @@ public class RailMoveEvent implements RailMoveListener {
     @Override
     public void onRailRotate(RailController railController, SegmentPiece railBlock, SegmentPiece railDocker) {
 
-        short railSpinnerClockwiseID = BlockManager.getFromName("Rail Spinner Clockwise").blockInfo.getId();
-        short railSpinnerCounterClockwiseID = BlockManager.getFromName("Rail Spinner CounterClockwise").blockInfo.getId();
-        short hiddenRailSpinnerClockwiseID = BlockManager.getFromName("Hidden Rail Spinner Clockwise").blockInfo.getId();
-        short hiddenRailSpinnerCounterClockwiseID = BlockManager.getFromName("Hidden Rail Spinner CounterClockwise").blockInfo.getId();
+        short railSpinnerClockwiseID = BlockManager.getFromName("Rail Spinner Clock Wise").blockInfo.getId();
+        short railSpinnerCounterClockwiseID = BlockManager.getFromName("Rail Spinner CounterClock Wise").blockInfo.getId();
+        short hiddenRailSpinnerClockwiseID = BlockManager.getFromName("Hidden Rail Spinner Clock Wise").blockInfo.getId();
+        short hiddenRailSpinnerCounterClockwiseID = BlockManager.getFromName("Hidden Rail Spinner CounterClock Wise").blockInfo.getId();
 
         short id = railBlock.getType();
         if(id == railSpinnerClockwiseID || id == hiddenRailSpinnerClockwiseID || id == railSpinnerCounterClockwiseID || id == hiddenRailSpinnerCounterClockwiseID) {
@@ -31,13 +31,23 @@ public class RailMoveEvent implements RailMoveListener {
 
     @Override
     public void onRailDockServer(RailController railController, SegmentPiece railBlock, SegmentPiece railDocker) {
+        short railSpinnerClockwiseID = BlockManager.getFromName("Rail Spinner Clock Wise").blockInfo.getId();
+        short railSpinnerCounterClockwiseID = BlockManager.getFromName("Rail Spinner CounterClock Wise").blockInfo.getId();
+        short hiddenRailSpinnerClockwiseID = BlockManager.getFromName("Hidden Rail Spinner Clock Wise").blockInfo.getId();
+        short hiddenRailSpinnerCounterClockwiseID = BlockManager.getFromName("Hidden Rail Spinner CounterClock Wise").blockInfo.getId();
 
+        short id = railBlock.getType();
+        if(id == railSpinnerClockwiseID || id == hiddenRailSpinnerClockwiseID || id == railSpinnerCounterClockwiseID || id == hiddenRailSpinnerCounterClockwiseID) {
+            railController.previous.rotationCode = getNextRotation(railController.previous.rotationCode);
+            railController.previous.continueRotation = true;
+            railController.applyRailGoTo();
+        }
     }
 
     private RailRelation.RotationType getNextRotation(RailRelation.RotationType previousRotation) {
         switch (previousRotation) {
             case NONE:
-                return RailRelation.RotationType.NONE;
+                return RailRelation.RotationType.CW_90;
             case CW_45:
                 return RailRelation.RotationType.CW_135;
             case CW_90:
