@@ -14,6 +14,7 @@ public class HiddenRailSpinnerClockwise extends BlockElement {
         blockInfo.setShoppable(true);
         blockInfo.controlling.addAll(Blocks.RAIL_ROTATOR_CLOCK_WISE.getInfo().controlling);
         blockInfo.controlledBy.addAll(Blocks.RAIL_ROTATOR_CLOCK_WISE.getInfo().controlledBy);
+        blockInfo.setBlended(true);
         blockInfo.setDrawOnlyInBuildMode(true);
         blockInfo.setBlockStyle(Blocks.RAIL_ROTATOR_CLOCK_WISE.getInfo().getBlockStyle().id);
 

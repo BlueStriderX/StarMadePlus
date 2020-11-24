@@ -2,6 +2,7 @@ package net.dovtech.starmadeplus.listener;
 
 import api.listener.fastevents.RailMoveListener;
 import net.dovtech.starmadeplus.blocks.BlockManager;
+import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.rails.RailController;
 import org.schema.game.common.controller.rails.RailRelation;
 import org.schema.game.common.data.SegmentPiece;
@@ -20,6 +21,7 @@ public class RailMoveEvent implements RailMoveListener {
         if(id == railSpinnerClockwiseID || id == hiddenRailSpinnerClockwiseID || id == railSpinnerCounterClockwiseID || id == hiddenRailSpinnerCounterClockwiseID) {
             railController.previous.rotationCode = getNextRotation(railController.previous.rotationCode);
             railController.previous.continueRotation = true;
+            railController.previous.railContactToGo = railBlock.getAbsolutePos(new Vector3i());
             railController.applyRailGoTo();
         }
     }
@@ -36,6 +38,7 @@ public class RailMoveEvent implements RailMoveListener {
         if(id == railSpinnerClockwiseID || id == hiddenRailSpinnerClockwiseID || id == railSpinnerCounterClockwiseID || id == hiddenRailSpinnerCounterClockwiseID) {
             railController.previous.rotationCode = getNextRotation(railController.previous.rotationCode);
             railController.previous.continueRotation = true;
+            railController.previous.railContactToGo = railBlock.getAbsolutePos(new Vector3i());
             railController.applyRailGoTo();
         }
     }
