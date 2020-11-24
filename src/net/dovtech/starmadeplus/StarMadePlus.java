@@ -391,7 +391,7 @@ public class StarMadePlus extends StarMod {
 
     private void loadTextures() {
         try {
-            String texturesFolder = "resource/textures/blocks/";
+            String texturesFolder = "/resource/textures/blocks/";
 
             textures.put("hidden-rail-spinner-clockwise_sides", StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream(texturesFolder + "hidden-rail-spinner-clockwise_sides.png"))));
             textures.put("hidden-rail-spinner-clockwise_top", StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream(texturesFolder + "hidden-rail-spinner-clockwise_top.png"))));

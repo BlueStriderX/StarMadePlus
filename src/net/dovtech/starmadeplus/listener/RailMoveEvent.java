@@ -8,14 +8,14 @@ import org.schema.game.common.data.SegmentPiece;
 
 public class RailMoveEvent implements RailMoveListener {
 
+    private short railSpinnerClockwiseID;
+    private short railSpinnerCounterClockwiseID;
+    private short hiddenRailSpinnerClockwiseID;
+    private short hiddenRailSpinnerCounterClockwiseID;
+
     @Override
     public void onRailRotate(RailController railController, SegmentPiece railBlock, SegmentPiece railDocker) {
-
-        short railSpinnerClockwiseID = BlockManager.getFromName("Rail Spinner Clock Wise").blockInfo.getId();
-        short railSpinnerCounterClockwiseID = BlockManager.getFromName("Rail Spinner CounterClock Wise").blockInfo.getId();
-        short hiddenRailSpinnerClockwiseID = BlockManager.getFromName("Hidden Rail Spinner Clock Wise").blockInfo.getId();
-        short hiddenRailSpinnerCounterClockwiseID = BlockManager.getFromName("Hidden Rail Spinner CounterClock Wise").blockInfo.getId();
-
+        if(railSpinnerClockwiseID == 0) getRailIDs();
         short id = railBlock.getType();
         if(id == railSpinnerClockwiseID || id == hiddenRailSpinnerClockwiseID || id == railSpinnerCounterClockwiseID || id == hiddenRailSpinnerCounterClockwiseID) {
             railController.previous.rotationCode = getNextRotation(railController.previous.rotationCode);
@@ -25,23 +25,26 @@ public class RailMoveEvent implements RailMoveListener {
     }
 
     @Override
-    public void onRailUndockServer(RailController railController, SegmentPiece railBlock, SegmentPiece railDocker) {
+    public void onRailUndock(RailController railController, SegmentPiece railBlock, SegmentPiece railDocker) {
 
     }
 
     @Override
-    public void onRailDockServer(RailController railController, SegmentPiece railBlock, SegmentPiece railDocker) {
-        short railSpinnerClockwiseID = BlockManager.getFromName("Rail Spinner Clock Wise").blockInfo.getId();
-        short railSpinnerCounterClockwiseID = BlockManager.getFromName("Rail Spinner CounterClock Wise").blockInfo.getId();
-        short hiddenRailSpinnerClockwiseID = BlockManager.getFromName("Hidden Rail Spinner Clock Wise").blockInfo.getId();
-        short hiddenRailSpinnerCounterClockwiseID = BlockManager.getFromName("Hidden Rail Spinner CounterClock Wise").blockInfo.getId();
-
+    public void onRailDock(RailController railController, SegmentPiece railBlock, SegmentPiece railDocker) {
+        if(railSpinnerClockwiseID == 0) getRailIDs();
         short id = railBlock.getType();
         if(id == railSpinnerClockwiseID || id == hiddenRailSpinnerClockwiseID || id == railSpinnerCounterClockwiseID || id == hiddenRailSpinnerCounterClockwiseID) {
             railController.previous.rotationCode = getNextRotation(railController.previous.rotationCode);
             railController.previous.continueRotation = true;
             railController.applyRailGoTo();
         }
+    }
+
+    private void getRailIDs() {
+        railSpinnerClockwiseID = BlockManager.getFromName("Rail Spinner Clock Wise").blockInfo.getId();
+        railSpinnerCounterClockwiseID = BlockManager.getFromName("Rail Spinner CounterClock Wise").blockInfo.getId();
+        hiddenRailSpinnerClockwiseID = BlockManager.getFromName("Hidden Rail Spinner Clock Wise").blockInfo.getId();
+        hiddenRailSpinnerCounterClockwiseID = BlockManager.getFromName("Hidden Rail Spinner CounterClock Wise").blockInfo.getId();
     }
 
     private RailRelation.RotationType getNextRotation(RailRelation.RotationType previousRotation) {
