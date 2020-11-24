@@ -1,0 +1,112 @@
+material "blinn3"
+{
+	technique blinn3_technique
+	{
+		pass blinn3_standard
+		{
+			shading phong
+			ambient 1 1 1 1
+			diffuse 1 1 1 1
+			specular 0.5 0.5 0.5 1 67.7803
+			emissive 0 0 0 1
+
+			texture_unit blinn3_Diffuse#0
+			{
+				texture DarkGreyBar.png
+				tex_coord_set 0
+				colour_op modulate
+			}
+		}
+	}
+}
+material "blinn5"
+{
+	technique blinn5_technique
+	{
+		pass blinn5_standard
+		{
+			shading phong
+			ambient 1 1 1 1
+			diffuse 1 1 1 1
+			specular 0.5 0.5 0.5 1 67.7803
+			emissive 0 0 0 1
+
+			texture_unit blinn5_Diffuse#0
+			{
+				texture Circle1.png
+				tex_coord_set 0
+				colour_op modulate
+			}
+
+			texture_unit blinn5_Unknown#1
+			{
+				texture Circle1.png
+				tex_coord_set 0
+				colour_op modulate
+			}
+		}
+	}
+}
+material "blinn1"
+{
+	technique blinn1_technique
+	{
+		pass blinn1_standard
+		{
+			shading phong
+			ambient 1 1 1 1
+			diffuse 1 1 1 1
+			specular 0.5 0.5 0.5 1 67.7803
+			emissive 0 0 0 1
+
+			texture_unit blinn1_Diffuse#0
+			{
+				texture Panel1.png
+				tex_coord_set 0
+				colour_op modulate
+			}
+		}
+	}
+}
+material "blinn2"
+{
+	technique blinn2_technique
+	{
+		pass blinn2_standard
+		{
+			shading phong
+			ambient 1 1 1 1
+			diffuse 1 1 1 1
+			specular 0.5 0.5 0.5 1 67.7803
+			emissive 0 0 0 1
+
+			texture_unit blinn2_Diffuse#0
+			{
+				texture Panel2.png
+				tex_coord_set 0
+				colour_op modulate
+			}
+		}
+	}
+}
+material "blinn4"
+{
+	technique blinn4_technique
+	{
+		pass blinn4_standard
+		{
+			shading phong
+			ambient 1 1 1 1
+			diffuse 1 1 1 1
+			specular 0.5 0.5 0.5 1 67.7803
+			emissive 0 0 0 1
+
+			texture_unit blinn4_Diffuse#0
+			{
+				texture ComputerBack1.png
+				tex_coord_set 0
+				colour_op modulate
+			}
+		}
+	}
+}

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class BlockManager {
 
-    public enum BlockSide {ALL, FRONT, BACK, TOP, BOTTOM, LEFT, RIGHT}
+    public enum BlockSide {ALL, TOP_BOTTOM, TOP_ONLY, FRONT, BACK, TOP, BOTTOM, LEFT, RIGHT}
 
     private static ArrayList<BlockElement> blocks = new ArrayList<>();
 

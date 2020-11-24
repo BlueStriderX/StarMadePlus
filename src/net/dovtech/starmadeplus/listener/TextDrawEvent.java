@@ -11,13 +11,11 @@ import org.schema.game.client.view.SegmentDrawer;
 import org.schema.game.client.view.textbox.AbstractTextBox;
 import org.schema.schine.graphicsengine.core.Controller;
 import org.schema.schine.graphicsengine.forms.Sprite;
-
 import javax.imageio.ImageIO;
-import javax.vecmath.Vector3f;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
-public class TextDrawListener implements TextBoxDrawListener {
+public class TextDrawEvent implements TextBoxDrawListener {
 
     @Override
     public void preDraw(SegmentDrawer.TextBoxSeg.TextBoxElement textBoxElement, AbstractTextBox abstractTextBox) {
@@ -102,9 +100,7 @@ public class TextDrawListener implements TextBoxDrawListener {
                     if (!blockImage) {
                         Sprite image = ImageManager.getImage(src);
                         if (image != null) {
-                            Vector3f newPos = new Vector3f(xOffset, yOffset, zOffset);
                             Transform newTransform = textBoxElement.worldpos;
-                            newTransform.transform(newPos);
                             newTransform.origin.x = newTransform.origin.x + xOffset;
                             newTransform.origin.y = newTransform.origin.y + yOffset;
                             newTransform.origin.z = newTransform.origin.z + zOffset;
@@ -115,6 +111,7 @@ public class TextDrawListener implements TextBoxDrawListener {
                 }
             } else {
                 abstractTextBox.getBg().setInvisible(false);
+                abstractTextBox.getBg().setSprite(Controller.getResLoader().getSprite("screen-gui-"));
             }
         }
     }

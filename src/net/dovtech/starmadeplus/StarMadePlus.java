@@ -11,13 +11,14 @@ import api.listener.events.block.SegmentPieceAddByMetadataEvent;
 import api.listener.events.block.SegmentPieceAddEvent;
 import api.listener.events.block.SegmentPieceRemoveEvent;
 import api.listener.fastevents.FastListenerCommon;
+import api.listener.fastevents.RailMoveListener;
 import api.mod.StarLoader;
 import api.mod.StarMod;
 import api.mod.config.FileConfiguration;
 import api.mod.config.PersistentObjectUtil;
-import net.dovtech.starmadeplus.blocks.BlockManager;
-import net.dovtech.starmadeplus.blocks.DisplayScreen;
-import net.dovtech.starmadeplus.listener.TextDrawListener;
+import net.dovtech.starmadeplus.blocks.*;
+import net.dovtech.starmadeplus.listener.RailMoveEvent;
+import net.dovtech.starmadeplus.listener.TextDrawEvent;
 import org.schema.game.client.controller.PlayerOkCancelInput;
 import org.schema.game.client.controller.PlayerTextAreaInput;
 import org.schema.game.client.controller.element.world.ClientSegmentProvider;
@@ -28,9 +29,11 @@ import org.schema.game.common.data.SendableGameState;
 import org.schema.game.common.data.element.ElementCollection;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.world.Segment;
+import org.schema.game.common.updater.FileUtil;
 import org.schema.game.network.objects.remote.RemoteTextBlockPair;
 import org.schema.game.network.objects.remote.TextBlockPair;
 import org.schema.schine.common.TextCallback;
+import org.schema.schine.graphicsengine.core.Controller;
 import org.schema.schine.graphicsengine.core.GLFrame;
 import org.schema.schine.graphicsengine.core.settings.PrefixNotFoundException;
 import org.schema.schine.graphicsengine.forms.font.FontLibrary;
@@ -46,13 +49,17 @@ public class StarMadePlus extends StarMod {
 
     //Other
     private static StarMadePlus instance;
+
     public enum GameMode {CLIENT, SERVER, SINGLEPLAYER}
-    public enum ImageFilterMode{BLACKLIST, WHITELIST}
+
+    public enum ImageFilterMode {BLACKLIST, WHITELIST}
+
     public enum LogType {DEBUG, INFO, WARNING, ERROR, SEVERE}
+
     private final String disclaimerMessage =
             "By pressing the ACCEPT button, you hereby acknowledge any and all responsibility for the images you\n" +
-            "post and that the creators of StarMadePlus, the StarLoader team, Schine, the Server or its owners,\n" +
-            "or any other person/entity that is not you cannot be held liable for anything you post.";
+                    "post and that the creators of StarMadePlus, the StarLoader team, Schine, the Server or its owners,\n" +
+                    "or any other person/entity that is not you cannot be held liable for anything you post.";
 
     //Logs
     private final String logPath = "moddata/StarMadePlus/logs/";
@@ -80,25 +87,33 @@ public class StarMadePlus extends StarMod {
         instance = this;
     }
 
-    public static void main(String[] args) { }
+    public static void main(String[] args) {
+    }
 
     @Override
     public void onGameStart() {
         setModName("StarMadePlus");
-        setModVersion("0.3.6");
+        setModVersion("0.4.2");
         setModAuthor("Dovtech");
         setModDescription("Minor tweaks and additions to improve the base game.");
+        setModSMVersion("0.202.108");
     }
 
     @Override
     public void onBlockConfigLoad(BlockConfig config) {
         BlockManager.addBlock(new DisplayScreen(config));
+        BlockManager.addBlock(new HoloProjector(config));
+        BlockManager.addBlock(new RailSpinnerClockwise(config));
+        BlockManager.addBlock(new RailSpinnerCounterClockwise(config));
+        BlockManager.addBlock(new HiddenRailSpinnerClockwise(config));
+        BlockManager.addBlock(new HiddenRailSpinnerCounterClockwise(config));
     }
 
     @Override
     public void onEnable() {
         registerFastListeners();
         registerListeners();
+        loadBlockModels();
         if (getGameState().equals(GameMode.SERVER) || getGameState().equals(GameMode.SINGLEPLAYER)) {
             initConfig();
             createLogs();
@@ -106,7 +121,8 @@ public class StarMadePlus extends StarMod {
     }
 
     private void registerFastListeners() {
-        FastListenerCommon.getTextBoxListeners().add(new TextDrawListener());
+        FastListenerCommon.getTextBoxListeners().add(new TextDrawEvent());
+        FastListenerCommon.getRailMoveListeners().add(new RailMoveEvent());
     }
 
     private void registerListeners() {
@@ -147,13 +163,13 @@ public class StarMadePlus extends StarMod {
                                 public void pressedSecondOption() { //Player does not accept disclaimer
                                     long index = piece.getTextBlockIndex();
                                     int pos = -1;
-                                    for(int i = 0; i < piece.getSegmentController().getTextBlocks().size(); i ++) {
-                                        if(piece.getSegmentController().getTextBlocks().get(i) == index) {
+                                    for (int i = 0; i < piece.getSegmentController().getTextBlocks().size(); i++) {
+                                        if (piece.getSegmentController().getTextBlocks().get(i) == index) {
                                             pos = i;
                                             break;
                                         }
                                     }
-                                    if(pos != -1) piece.getSegmentController().getTextBlocks().remove(pos);
+                                    if (pos != -1) piece.getSegmentController().getTextBlocks().remove(pos);
                                     event.setCanceled(true);
                                 }
                             };
@@ -174,6 +190,64 @@ public class StarMadePlus extends StarMod {
                         }
 
                     } else if (piece.getType() == Objects.requireNonNull(BlockManager.getFromName("Display Screen")).blockInfo.getId()) {
+
+                        final PlayerState player = event.getPlayer();
+                        ArrayList<Object> playerList = PersistentObjectUtil.getObjects(StarMadePlus.getInstance(), String.class);
+                        boolean acceptedDisclaimer = false;
+                        for (Object object : playerList) {
+                            String string = (String) object;
+                            if (string.equals("[ACCEPTED DISCLAIMER]: " + player.getName())) { //Player has already accepted disclaimer
+                                acceptedDisclaimer = true;
+                                String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
+                                logImage(text, event.getPlayer());
+                                break;
+                            }
+                        }
+                        if (!acceptedDisclaimer) { //Player has not accepted disclaimer
+                            PlayerOkCancelInput input = new PlayerOkCancelInput("Disclaimer Popup", GameClient.getClientState(), "Accept Disclaimer", disclaimerMessage) {
+                                @Override
+                                public void onDeactivate() {
+                                    pressedSecondOption();
+                                }
+
+                                @Override
+                                public void pressedOK() { //Player accepts disclaimer
+                                    PersistentObjectUtil.addObject(StarMadePlus.getInstance(), "[ACCEPTED DISCLAIMER]: " + player.getName());
+                                    PersistentObjectUtil.save(StarMadePlus.getInstance());
+                                    String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
+                                    logImage(text, event.getPlayer());
+                                }
+
+                                @Override
+                                public void pressedSecondOption() { //Player does not accept disclaimer
+                                    long index = piece.getTextBlockIndex();
+                                    int pos = -1;
+                                    for (int i = 0; i < piece.getSegmentController().getTextBlocks().size(); i++) {
+                                        if (piece.getSegmentController().getTextBlocks().get(i) == index) {
+                                            pos = i;
+                                            break;
+                                        }
+                                    }
+                                    if (pos != -1) piece.getSegmentController().getTextBlocks().remove(pos);
+                                    event.setCanceled(true);
+                                }
+                            };
+                            input.setDeactivateOnEscape(false);
+                            input.getInputPanel().onInit();
+                            input.getInputPanel().setCancelButton(false);
+
+                            input.getInputPanel().setOkButton(true);
+                            input.getInputPanel().setOkButtonText("ACCEPT");
+
+                            input.getInputPanel().setSecondOptionButton(true);
+                            input.getInputPanel().setSecondOptionButtonText("DECLINE");
+
+                            input.getInputPanel().background.setPos(470.0F, 35.0F, 0.0F);
+                            input.getInputPanel().background.setWidth((float) (GLFrame.getWidth() - 435));
+                            input.getInputPanel().background.setHeight((float) (GLFrame.getHeight() - 70));
+                            input.activate();
+                        }
+
                         final PlayerInteractionControlManager cm = event.getControlManager();
 
                         String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
@@ -251,7 +325,7 @@ public class StarMadePlus extends StarMod {
         StarLoader.registerListener(SegmentPieceRemoveEvent.class, new Listener<SegmentPieceRemoveEvent>() {
             @Override
             public void onEvent(SegmentPieceRemoveEvent event) {
-                if(event.getType() == Objects.requireNonNull(BlockManager.getFromName("Display Screen")).blockInfo.getId()) {
+                if (event.getType() == Objects.requireNonNull(BlockManager.getFromName("Display Screen")).blockInfo.getId()) {
                     Segment segment = event.getSegment();
                     long absoluteIndex = segment.getAbsoluteIndex(event.getX(), event.getY(), event.getZ());
                     long indexAndOrientation = ElementCollection.getIndex4(absoluteIndex, event.getOrientation());
@@ -264,7 +338,7 @@ public class StarMadePlus extends StarMod {
         StarLoader.registerListener(SegmentPieceAddByMetadataEvent.class, new Listener<SegmentPieceAddByMetadataEvent>() {
             @Override
             public void onEvent(SegmentPieceAddByMetadataEvent event) {
-                if(event.getType() == Objects.requireNonNull(BlockManager.getFromName("Display Screen")).blockInfo.getId()) {
+                if (event.getType() == Objects.requireNonNull(BlockManager.getFromName("Display Screen")).blockInfo.getId()) {
                     event.getSegment().getSegmentController().getTextBlocks().add(event.getIndexAndOrientation());
                 }
             }
@@ -298,6 +372,29 @@ public class StarMadePlus extends StarMod {
         }
     }
 
+    private void loadBlockModels() {
+        try {
+            File modelsFolder = new File(StarMadePlus.class.getResource("/net/dovtech/starmadeplus/resource/models").getFile());
+            if(modelsFolder.exists()) {
+                for(File modelFile : Objects.requireNonNull(modelsFolder.listFiles())) {
+                    if(modelFile.isDirectory()) {
+                        File destinationFile = new File("/data/models/mods/StarMadePlus/" + modelFile.getName());
+                        if(!destinationFile.exists()) {
+                            destinationFile.mkdirs();
+                            FileUtil.copyFile(modelFile, destinationFile);
+                        }
+                        Controller.getResLoader().loadModelDirectly(modelFile.getName(), "/models/mods/StarMadePlus/" + modelFile.getName(), modelFile.getName() + ".mesh");
+                    }
+                }
+            } else {
+                DebugFile.log("[ERROR]: Could not locate models directory!", this);
+                if(debugMode) DebugFile.log("[DEBUG]: Path evaluated to " + modelsFolder.getPath());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public GameMode getGameState() {
         if (GameCommon.isDedicatedServer()) {
             return GameMode.SERVER;
@@ -311,7 +408,7 @@ public class StarMadePlus extends StarMod {
     }
 
     public void logAdmin(String message, LogType logType) {
-        if(getGameState().equals(GameMode.SERVER) || getGameState().equals(GameMode.SINGLEPLAYER)) {
+        if (getGameState().equals(GameMode.SERVER) || getGameState().equals(GameMode.SINGLEPLAYER)) {
             try {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(adminLogFile, true));
                 switch (logType) {
@@ -340,10 +437,10 @@ public class StarMadePlus extends StarMod {
     }
 
     public void logImage(String text, PlayerState player) {
-        if(getGameState().equals(GameMode.SERVER) || getGameState().equals(GameMode.SINGLEPLAYER)) {
+        if (getGameState().equals(GameMode.SERVER) || getGameState().equals(GameMode.SINGLEPLAYER)) {
             try {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(imageLogFile, true));
-                writer.append(player.getName()).append(" posted an image ").append(text).append("on a display module at ").append(String.valueOf(System.currentTimeMillis()));
+                writer.append(player.getName()).append(" posted an image ").append(text).append("on a display module.");
                 writer.close();
             } catch (IOException e) {
                 e.printStackTrace();
