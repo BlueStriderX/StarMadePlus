@@ -19,10 +19,19 @@ public class RailMoveEvent implements RailMoveListener {
         if(railSpinnerClockwiseID == 0) getRailIDs();
         short id = railBlock.getType();
         if(id == railSpinnerClockwiseID || id == hiddenRailSpinnerClockwiseID || id == railSpinnerCounterClockwiseID || id == hiddenRailSpinnerCounterClockwiseID) {
-            railController.previous.rotationCode = getNextRotation(railController.previous.rotationCode);
-            railController.previous.continueRotation = true;
-            railController.previous.railContactToGo = railBlock.getAbsolutePos(new Vector3i());
-            railController.applyRailGoTo();
+            if(railBlock.isActive() && railController.previous.doneInRotationServer() && railController.previous.rotationCode.equals(RailRelation.RotationType.NONE) && !railController.previous.continueRotation && railController.next.size() == 0) {
+                /*
+                RailRelation newRelation = new RailRelation(railBlock, railDocker);
+                newRelation.rotationCode = rotationType;
+                newRelation.railContactToGo = railBlock.getAbsolutePos(new Vector3i());
+                railController.next.add(newRelation);
+                 */
+                railController.previous.rotationCode = getNextRotation(railController.previous.rotationCode);
+                railController.previous.railContactToGo = railBlock.getAbsolutePos(new Vector3i());
+                railController.previous.continueRotation = true;
+            } else {
+                //railController.previous.continueRotation = false;
+            }
         }
     }
 
@@ -33,14 +42,7 @@ public class RailMoveEvent implements RailMoveListener {
 
     @Override
     public void onRailDock(RailController railController, SegmentPiece railBlock, SegmentPiece railDocker) {
-        if(railSpinnerClockwiseID == 0) getRailIDs();
-        short id = railBlock.getType();
-        if(id == railSpinnerClockwiseID || id == hiddenRailSpinnerClockwiseID || id == railSpinnerCounterClockwiseID || id == hiddenRailSpinnerCounterClockwiseID) {
-            railController.previous.rotationCode = getNextRotation(railController.previous.rotationCode);
-            railController.previous.continueRotation = true;
-            railController.previous.railContactToGo = railBlock.getAbsolutePos(new Vector3i());
-            railController.applyRailGoTo();
-        }
+
     }
 
     private void getRailIDs() {

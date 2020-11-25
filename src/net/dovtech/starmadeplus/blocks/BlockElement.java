@@ -17,7 +17,7 @@ public abstract class BlockElement {
             try {
                 int index;
                 for (index = 0; index < textureSides.length; index ++) {
-                    String textureName = name.toLowerCase().replaceAll(" ", "-") + "_" + textureSides[index].name().toLowerCase();
+                    String textureName = name.toLowerCase().replaceAll(" ", "_") + "_" + textureSides[index].name().toLowerCase();
                     StarLoaderTexture texture = StarMadePlus.getInstance().textures.get(textureName);
                     textureIDs[index] = (short) texture.getTextureId();
                 }
@@ -26,7 +26,7 @@ public abstract class BlockElement {
             }
         } else if(textureSides.length == 1 && textureSides[0] == BlockManager.BlockSide.ALL) {
             try {
-                String textureName = name.toLowerCase().replaceAll(" ", "-");
+                String textureName = name.toLowerCase().replaceAll(" ", "_");
                 StarLoaderTexture texture = StarMadePlus.getInstance().textures.get(textureName);
                 short textureID = (short) texture.getTextureId();
                 textureIDs = new short[] {textureID, textureID, textureID, textureID, textureID, textureID};
@@ -35,8 +35,8 @@ public abstract class BlockElement {
             }
         } else if (textureSides.length == 1 && textureSides[0] == BlockManager.BlockSide.TOP_ONLY) {
                 try {
-                    String topName = name.toLowerCase().replaceAll(" ", "-") + "_top";
-                    String sidesName = name.toLowerCase().replaceAll(" ", "-") + "_sides";
+                    String topName = name.toLowerCase().replaceAll(" ", "_") + "_top";
+                    String sidesName = name.toLowerCase().replaceAll(" ", "_") + "_sides";
 
                     StarLoaderTexture topTexture =  StarMadePlus.getInstance().textures.get(topName);
                     StarLoaderTexture sidesTexture = StarMadePlus.getInstance().textures.get(sidesName);
@@ -52,9 +52,9 @@ public abstract class BlockElement {
                 }
         } else if(textureSides.length == 1 && textureSides[0] == BlockManager.BlockSide.TOP_BOTTOM) {
             try {
-                String topName = name.toLowerCase().replaceAll(" ", "-") + "_top";
-                String bottomName = name.toLowerCase().replaceAll(" ", "-") + "_bottom";
-                String sidesName = name.toLowerCase().replaceAll(" ", "-") + "_sides";
+                String topName = name.toLowerCase().replaceAll(" ", "_") + "_top";
+                String bottomName = name.toLowerCase().replaceAll(" ", "_") + "_bottom";
+                String sidesName = name.toLowerCase().replaceAll(" ", "_") + "_sides";
 
                 StarLoaderTexture topTexture = StarMadePlus.getInstance().textures.get(topName);
                 StarLoaderTexture bottomTexture = StarMadePlus.getInstance().textures.get(bottomName);

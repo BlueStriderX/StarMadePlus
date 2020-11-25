@@ -9,7 +9,7 @@ public class RailSpinnerCounterClockwise extends BlockElement {
     public RailSpinnerCounterClockwise(BlockConfig config) {
         super(config, "Rail Spinner CounterClock Wise", BlockManager.BlockSide.TOP_BOTTOM);
         blockInfo.setInRecipe(true);
-        blockInfo.canActivate = false;
+        blockInfo.canActivate = true;
         blockInfo.setPrice(Blocks.RAIL_ROTATOR_COUNTER_CLOCK_WISE.getInfo().price);
         blockInfo.setShoppable(true);
         blockInfo.controlling.addAll(Blocks.RAIL_ROTATOR_COUNTER_CLOCK_WISE.getInfo().controlling);

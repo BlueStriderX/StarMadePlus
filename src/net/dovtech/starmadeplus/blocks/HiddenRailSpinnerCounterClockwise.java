@@ -10,7 +10,7 @@ public class HiddenRailSpinnerCounterClockwise extends BlockElement {
     public HiddenRailSpinnerCounterClockwise(BlockConfig config) {
         super(config, "Hidden Rail Spinner CounterClock Wise", BlockManager.BlockSide.TOP_ONLY);
         blockInfo.setInRecipe(true);
-        blockInfo.canActivate = false;
+        blockInfo.canActivate = true;
         blockInfo.setPrice(Blocks.RAIL_ROTATOR_COUNTER_CLOCK_WISE.getInfo().price);
         blockInfo.setShoppable(true);
         blockInfo.controlling.addAll(Blocks.RAIL_ROTATOR_COUNTER_CLOCK_WISE.getInfo().controlling);

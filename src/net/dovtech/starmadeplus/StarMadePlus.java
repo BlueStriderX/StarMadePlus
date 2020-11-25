@@ -391,8 +391,14 @@ public class StarMadePlus extends StarMod {
 
     private void loadTextures() {
         try {
-            String texturesFolder = "/resource/textures/blocks/";
+            //String texturesFolder = "/resource/textures/blocks/";
+            URL url = StarMadePlus.class.getResource("resource/textures/blocks");
+            File texturesFolder = new File(url.getFile());
+            for(File file : Objects.requireNonNull(texturesFolder.listFiles())) {
+                textures.put(file.getName().split(".png")[0], StarLoaderTexture.newBlockTexture(ImageIO.read(file)));
+            }
 
+            /*
             textures.put("hidden-rail-spinner-clockwise_sides", StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream(texturesFolder + "hidden-rail-spinner-clockwise_sides.png"))));
             textures.put("hidden-rail-spinner-clockwise_top", StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream(texturesFolder + "hidden-rail-spinner-clockwise_top.png"))));
 
@@ -406,6 +412,7 @@ public class StarMadePlus extends StarMod {
             textures.put("rail-spinner-counterclockwise_bottom", StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream(texturesFolder + "rail-spinner-counterclockwise_bottom.png"))));
             textures.put("rail-spinner-counterclockwise_sides", StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream(texturesFolder + "rail-spinner-counterclockwise_sides.png"))));
             textures.put("rail-spinner-counterclockwise_top", StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream(texturesFolder + "rail-spinner-counterclockwise_top.png"))));
+            */
         } catch (Exception e) {
             e.printStackTrace();
         }
