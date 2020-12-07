@@ -1,12 +1,14 @@
 package net.dovtech.starmadeplus.blocks;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class BlockManager {
 
-    public enum BlockSide {ALL, TOP_BOTTOM, TOP_ONLY, FRONT, BACK, TOP, BOTTOM, LEFT, RIGHT}
+    public enum TextureType {ALL, MODEL, MULTIBLOCK, TOP_BOTTOM, TOP_ONLY, COMPUTER, FRONT, BACK, TOP, BOTTOM, RIGHT, LEFT}
 
     private static ArrayList<BlockElement> blocks = new ArrayList<>();
+    public static HashMap<String, Integer> customFactories = new HashMap<>();
 
     public static BlockElement getFromID(short ID) {
         for(BlockElement block : blocks) {

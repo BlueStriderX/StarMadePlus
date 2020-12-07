@@ -3,15 +3,14 @@ package net.dovtech.starmadeplus.blocks;
 import api.config.BlockConfig;
 import api.utils.textures.StarLoaderTexture;
 import net.dovtech.starmadeplus.StarMadePlus;
-import org.schema.game.client.view.cubes.shapes.BlockStyle;
 import org.schema.game.common.data.element.ElementInformation;
-import javax.imageio.ImageIO;
 
 public abstract class BlockElement {
 
     public ElementInformation blockInfo;
+    private final String[] blockSideNames = {"front", "back", "top", "bottom", "right", "left"};
 
-    public BlockElement(BlockConfig config, String name, BlockManager.BlockSide... textureSides) {
+    public BlockElement(BlockConfig config, String name, BlockManager.TextureType... textureSides) {
         short[] textureIDs = new short[6];
         if(textureSides.length == 6) {
             try {
@@ -24,7 +23,7 @@ public abstract class BlockElement {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else if(textureSides.length == 1 && textureSides[0] == BlockManager.BlockSide.ALL) {
+        } else if(textureSides.length == 1 && textureSides[0] == BlockManager.TextureType.ALL) {
             try {
                 String textureName = name.toLowerCase().replaceAll(" ", "_");
                 StarLoaderTexture texture = StarMadePlus.getInstance().textures.get(textureName);
@@ -33,7 +32,7 @@ public abstract class BlockElement {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else if (textureSides.length == 1 && textureSides[0] == BlockManager.BlockSide.TOP_ONLY) {
+        } else if (textureSides.length == 1 && textureSides[0] == BlockManager.TextureType.TOP_ONLY) {
                 try {
                     String topName = name.toLowerCase().replaceAll(" ", "_") + "_top";
                     String sidesName = name.toLowerCase().replaceAll(" ", "_") + "_sides";
@@ -50,7 +49,7 @@ public abstract class BlockElement {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-        } else if(textureSides.length == 1 && textureSides[0] == BlockManager.BlockSide.TOP_BOTTOM) {
+        } else if(textureSides.length == 1 && textureSides[0] == BlockManager.TextureType.TOP_BOTTOM) {
             try {
                 String topName = name.toLowerCase().replaceAll(" ", "_") + "_top";
                 String bottomName = name.toLowerCase().replaceAll(" ", "_") + "_bottom";
@@ -69,7 +68,21 @@ public abstract class BlockElement {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        } else if(textureSides.length == 1 && textureSides[0] == BlockManager.TextureType.COMPUTER) {
+            try {
+                for(int i = 0; i < 6; i ++) {
+                    String textureName = name.toLowerCase().replaceAll(" ", "_") + "_" + blockSideNames[i];
+                    StarLoaderTexture texture = StarMadePlus.getInstance().textures.get(textureName);
+                    textureIDs[i] = (short) texture.getTextureId();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         blockInfo = config.newElement(StarMadePlus.getInstance(), name, textureIDs);
+    }
+
+    public short getId() {
+        return blockInfo.getId();
     }
 }

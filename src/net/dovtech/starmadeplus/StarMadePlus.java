@@ -11,35 +11,37 @@ import api.listener.events.block.SegmentPieceAddByMetadataEvent;
 import api.listener.events.block.SegmentPieceAddEvent;
 import api.listener.events.block.SegmentPieceRemoveEvent;
 import api.listener.fastevents.FastListenerCommon;
-import api.listener.fastevents.RailMoveListener;
 import api.mod.StarLoader;
 import api.mod.StarMod;
 import api.mod.config.FileConfiguration;
 import api.mod.config.PersistentObjectUtil;
 import api.utils.textures.StarLoaderTexture;
-import net.dovtech.starmadeplus.blocks.*;
+import net.dovtech.starmadeplus.blocks.BlockManager;
+import net.dovtech.starmadeplus.blocks.decor.DisplayScreen;
+import net.dovtech.starmadeplus.blocks.multiblocks.deepstorage.DeepStorageComponent;
+import net.dovtech.starmadeplus.blocks.multiblocks.deepstorage.DeepStorageController;
+import net.dovtech.starmadeplus.blocks.multiblocks.deepstorage.DeepStorageDisplay;
 import net.dovtech.starmadeplus.listener.RailMoveEvent;
 import net.dovtech.starmadeplus.listener.TextDrawEvent;
-import org.newdawn.slick.Image;
 import org.schema.game.client.controller.PlayerOkCancelInput;
 import org.schema.game.client.controller.PlayerTextAreaInput;
 import org.schema.game.client.controller.element.world.ClientSegmentProvider;
 import org.schema.game.client.controller.manager.ingame.PlayerInteractionControlManager;
+import org.schema.game.client.view.GameResourceLoader;
 import org.schema.game.common.controller.SendableSegmentProvider;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.SendableGameState;
 import org.schema.game.common.data.element.ElementCollection;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.world.Segment;
-import org.schema.game.common.updater.FileUtil;
 import org.schema.game.network.objects.remote.RemoteTextBlockPair;
 import org.schema.game.network.objects.remote.TextBlockPair;
 import org.schema.schine.common.TextCallback;
 import org.schema.schine.graphicsengine.core.Controller;
 import org.schema.schine.graphicsengine.core.GLFrame;
+import org.schema.schine.graphicsengine.core.ResourceException;
 import org.schema.schine.graphicsengine.core.settings.PrefixNotFoundException;
 import org.schema.schine.graphicsengine.forms.font.FontLibrary;
-
 import javax.imageio.ImageIO;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -80,7 +82,8 @@ public class StarMadePlus extends StarMod {
             "max-image-scale: 15",
             "max-image-offset: 30",
             "image-filter-mode: blacklist",
-            "image-filter: porn,hentai,sex,nsfw"
+            "image-filter: porn,hentai,sex,nsfw",
+            "tactical-map-max-view-distance: 3"
     };
     public boolean debugMode = false;
     public int maxDisplayDrawDistance = 50;
@@ -88,6 +91,7 @@ public class StarMadePlus extends StarMod {
     public float maxImageOffset = 30;
     public ImageFilterMode imageFilterMode = ImageFilterMode.BLACKLIST;
     public ArrayList<String> imageFilter = new ArrayList<>();
+    public int tacticalMapMaxViewDistance = 3;
 
 
     public StarMadePlus() {
@@ -100,7 +104,7 @@ public class StarMadePlus extends StarMod {
     @Override
     public void onGameStart() {
         setModName("StarMadePlus");
-        setModVersion("0.4.2");
+        setModVersion("0.5.4");
         setModAuthor("Dovtech");
         setModDescription("Minor tweaks and additions to improve the base game.");
         setModSMVersion("0.202.108");
@@ -108,12 +112,27 @@ public class StarMadePlus extends StarMod {
 
     @Override
     public void onBlockConfigLoad(BlockConfig config) {
+        //Decor Blocks
         BlockManager.addBlock(new DisplayScreen(config));
-        BlockManager.addBlock(new HoloProjector(config));
-        BlockManager.addBlock(new RailSpinnerClockwise(config));
-        BlockManager.addBlock(new RailSpinnerCounterClockwise(config));
-        BlockManager.addBlock(new HiddenRailSpinnerClockwise(config));
-        BlockManager.addBlock(new HiddenRailSpinnerCounterClockwise(config));
+        //BlockManager.addBlock(new BlueHoloProjector(config));
+
+        //Multiblocks
+        //BlockManager.addBlock(new DeepStorageController(config));
+        //BlockManager.addBlock(new DeepStorageDisplay(config));
+        //BlockManager.addBlock(new DeepStorageComponent(config));
+
+        //Rails
+        //BlockManager.addBlock(new RailSpinnerClockwise(config));
+        //BlockManager.addBlock(new RailSpinnerCounterClockwise(config));
+        //BlockManager.addBlock(new HiddenRailSpinnerClockwise(config));
+        //BlockManager.addBlock(new HiddenRailSpinnerCounterClockwise(config));
+
+        //Systems
+        //BlockManager.addBlock(new StellarLifterController(config));
+        //new CrystallizerController(config);
+
+        //Resources
+        //BlockManager.addBlock(new PhotonShard(config));
     }
 
     @Override
@@ -129,196 +148,199 @@ public class StarMadePlus extends StarMod {
     }
 
     private void registerFastListeners() {
-        FastListenerCommon.getTextBoxListeners().add(new TextDrawEvent());
-        FastListenerCommon.getRailMoveListeners().add(new RailMoveEvent());
+        FastListenerCommon.textBoxListeners.add(new TextDrawEvent());
+        FastListenerCommon.railMoveListeners.add(new RailMoveEvent());
     }
 
     private void registerListeners() {
         StarLoader.registerListener(SegmentPieceActivateByPlayer.class, new Listener<SegmentPieceActivateByPlayer>() {
             @Override
             public void onEvent(final SegmentPieceActivateByPlayer event) {
-                if (getGameState().equals(GameMode.SERVER) || getGameState().equals(GameMode.SINGLEPLAYER)) {
-                    final SegmentPiece piece = event.getSegmentPiece();
-                    if (piece.getType() == Blocks.DISPLAY_MODULE.getId()) {
-                        final PlayerState player = event.getPlayer();
-                        ArrayList<Object> playerList = PersistentObjectUtil.getObjects(StarMadePlus.getInstance(), String.class);
-                        boolean acceptedDisclaimer = false;
-                        for (Object object : playerList) {
-                            String string = (String) object;
-                            if (string.equals("[ACCEPTED DISCLAIMER]: " + player.getName())) { //Player has already accepted disclaimer
-                                acceptedDisclaimer = true;
-                                String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
-                                logImage(text, event.getPlayer());
-                                break;
-                            }
-                        }
-                        if (!acceptedDisclaimer) { //Player has not accepted disclaimer
-                            PlayerOkCancelInput input = new PlayerOkCancelInput("Disclaimer Popup", GameClient.getClientState(), "Accept Disclaimer", disclaimerMessage) {
-                                @Override
-                                public void onDeactivate() {
-                                    pressedSecondOption();
-                                }
+                final SegmentPiece piece = event.getSegmentPiece();
+                if (piece.getType() == BlockManager.getFromName("Holo Table")) {
 
-                                @Override
-                                public void pressedOK() { //Player accepts disclaimer
-                                    PersistentObjectUtil.addObject(StarMadePlus.getInstance(), "[ACCEPTED DISCLAIMER]: " + player.getName());
-                                    PersistentObjectUtil.save(StarMadePlus.getInstance());
+                } else {
+                    if (getGameState().equals(GameMode.SERVER) || getGameState().equals(GameMode.SINGLEPLAYER)) {
+                        if (piece.getType() == Blocks.DISPLAY_MODULE.getId()) {
+                            final PlayerState player = event.getPlayer();
+                            ArrayList<Object> playerList = PersistentObjectUtil.getObjects(StarMadePlus.getInstance(), String.class);
+                            boolean acceptedDisclaimer = false;
+                            for (Object object : playerList) {
+                                String string = (String) object;
+                                if (string.equals("[ACCEPTED DISCLAIMER]: " + player.getName())) { //Player has already accepted disclaimer
+                                    acceptedDisclaimer = true;
                                     String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
                                     logImage(text, event.getPlayer());
+                                    break;
                                 }
-
-                                @Override
-                                public void pressedSecondOption() { //Player does not accept disclaimer
-                                    long index = piece.getTextBlockIndex();
-                                    int pos = -1;
-                                    for (int i = 0; i < piece.getSegmentController().getTextBlocks().size(); i++) {
-                                        if (piece.getSegmentController().getTextBlocks().get(i) == index) {
-                                            pos = i;
-                                            break;
-                                        }
-                                    }
-                                    if (pos != -1) piece.getSegmentController().getTextBlocks().remove(pos);
-                                    event.setCanceled(true);
-                                }
-                            };
-                            input.setDeactivateOnEscape(false);
-                            input.getInputPanel().onInit();
-                            input.getInputPanel().setCancelButton(false);
-
-                            input.getInputPanel().setOkButton(true);
-                            input.getInputPanel().setOkButtonText("ACCEPT");
-
-                            input.getInputPanel().setSecondOptionButton(true);
-                            input.getInputPanel().setSecondOptionButtonText("DECLINE");
-
-                            input.getInputPanel().background.setPos(470.0F, 35.0F, 0.0F);
-                            input.getInputPanel().background.setWidth((float) (GLFrame.getWidth() - 435));
-                            input.getInputPanel().background.setHeight((float) (GLFrame.getHeight() - 70));
-                            input.activate();
-                        }
-
-                    } else if (piece.getType() == Objects.requireNonNull(BlockManager.getFromName("Display Screen")).blockInfo.getId()) {
-
-                        final PlayerState player = event.getPlayer();
-                        ArrayList<Object> playerList = PersistentObjectUtil.getObjects(StarMadePlus.getInstance(), String.class);
-                        boolean acceptedDisclaimer = false;
-                        for (Object object : playerList) {
-                            String string = (String) object;
-                            if (string.equals("[ACCEPTED DISCLAIMER]: " + player.getName())) { //Player has already accepted disclaimer
-                                acceptedDisclaimer = true;
-                                String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
-                                logImage(text, event.getPlayer());
-                                break;
                             }
-                        }
-                        if (!acceptedDisclaimer) { //Player has not accepted disclaimer
-                            PlayerOkCancelInput input = new PlayerOkCancelInput("Disclaimer Popup", GameClient.getClientState(), "Accept Disclaimer", disclaimerMessage) {
-                                @Override
-                                public void onDeactivate() {
-                                    pressedSecondOption();
-                                }
+                            if (!acceptedDisclaimer) { //Player has not accepted disclaimer
+                                PlayerOkCancelInput input = new PlayerOkCancelInput("Disclaimer Popup", GameClient.getClientState(), "Accept Disclaimer", disclaimerMessage) {
+                                    @Override
+                                    public void onDeactivate() {
+                                        pressedSecondOption();
+                                    }
 
-                                @Override
-                                public void pressedOK() { //Player accepts disclaimer
-                                    PersistentObjectUtil.addObject(StarMadePlus.getInstance(), "[ACCEPTED DISCLAIMER]: " + player.getName());
-                                    PersistentObjectUtil.save(StarMadePlus.getInstance());
+                                    @Override
+                                    public void pressedOK() { //Player accepts disclaimer
+                                        PersistentObjectUtil.addObject(StarMadePlus.getInstance(), "[ACCEPTED DISCLAIMER]: " + player.getName());
+                                        PersistentObjectUtil.save(StarMadePlus.getInstance());
+                                        String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
+                                        logImage(text, event.getPlayer());
+                                    }
+
+                                    @Override
+                                    public void pressedSecondOption() { //Player does not accept disclaimer
+                                        long index = piece.getTextBlockIndex();
+                                        int pos = -1;
+                                        for (int i = 0; i < piece.getSegmentController().getTextBlocks().size(); i++) {
+                                            if (piece.getSegmentController().getTextBlocks().get(i) == index) {
+                                                pos = i;
+                                                break;
+                                            }
+                                        }
+                                        if (pos != -1) piece.getSegmentController().getTextBlocks().remove(pos);
+                                        event.setCanceled(true);
+                                    }
+                                };
+                                input.setDeactivateOnEscape(false);
+                                input.getInputPanel().onInit();
+                                input.getInputPanel().setCancelButton(false);
+
+                                input.getInputPanel().setOkButton(true);
+                                input.getInputPanel().setOkButtonText("ACCEPT");
+
+                                input.getInputPanel().setSecondOptionButton(true);
+                                input.getInputPanel().setSecondOptionButtonText("DECLINE");
+
+                                input.getInputPanel().background.setPos(470.0F, 35.0F, 0.0F);
+                                input.getInputPanel().background.setWidth((float) (GLFrame.getWidth() - 435));
+                                input.getInputPanel().background.setHeight((float) (GLFrame.getHeight() - 70));
+                                input.activate();
+                            }
+
+                        } else if (piece.getType() == Objects.requireNonNull(BlockManager.getFromName("Display Screen")).blockInfo.getId()) {
+
+                            final PlayerState player = event.getPlayer();
+                            ArrayList<Object> playerList = PersistentObjectUtil.getObjects(StarMadePlus.getInstance(), String.class);
+                            boolean acceptedDisclaimer = false;
+                            for (Object object : playerList) {
+                                String string = (String) object;
+                                if (string.equals("[ACCEPTED DISCLAIMER]: " + player.getName())) { //Player has already accepted disclaimer
+                                    acceptedDisclaimer = true;
                                     String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
                                     logImage(text, event.getPlayer());
+                                    break;
+                                }
+                            }
+                            if (!acceptedDisclaimer) { //Player has not accepted disclaimer
+                                PlayerOkCancelInput input = new PlayerOkCancelInput("Disclaimer Popup", GameClient.getClientState(), "Accept Disclaimer", disclaimerMessage) {
+                                    @Override
+                                    public void onDeactivate() {
+                                        pressedSecondOption();
+                                    }
+
+                                    @Override
+                                    public void pressedOK() { //Player accepts disclaimer
+                                        PersistentObjectUtil.addObject(StarMadePlus.getInstance(), "[ACCEPTED DISCLAIMER]: " + player.getName());
+                                        PersistentObjectUtil.save(StarMadePlus.getInstance());
+                                        String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
+                                        logImage(text, event.getPlayer());
+                                    }
+
+                                    @Override
+                                    public void pressedSecondOption() { //Player does not accept disclaimer
+                                        long index = piece.getTextBlockIndex();
+                                        int pos = -1;
+                                        for (int i = 0; i < piece.getSegmentController().getTextBlocks().size(); i++) {
+                                            if (piece.getSegmentController().getTextBlocks().get(i) == index) {
+                                                pos = i;
+                                                break;
+                                            }
+                                        }
+                                        if (pos != -1) piece.getSegmentController().getTextBlocks().remove(pos);
+                                        event.setCanceled(true);
+                                    }
+                                };
+                                input.setDeactivateOnEscape(false);
+                                input.getInputPanel().onInit();
+                                input.getInputPanel().setCancelButton(false);
+
+                                input.getInputPanel().setOkButton(true);
+                                input.getInputPanel().setOkButtonText("ACCEPT");
+
+                                input.getInputPanel().setSecondOptionButton(true);
+                                input.getInputPanel().setSecondOptionButtonText("DECLINE");
+
+                                input.getInputPanel().background.setPos(470.0F, 35.0F, 0.0F);
+                                input.getInputPanel().background.setWidth((float) (GLFrame.getWidth() - 435));
+                                input.getInputPanel().background.setHeight((float) (GLFrame.getHeight() - 70));
+                                input.activate();
+                            }
+
+                            final PlayerInteractionControlManager cm = event.getControlManager();
+
+                            String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
+                            logImage(text, event.getPlayer());
+
+                            if (text == null) {
+                                text = "";
+                            }
+
+                            final PlayerTextAreaInput t = new PlayerTextAreaInput("EDIT_DISPLAY_BLOCK_POPUP", cm.getState(), 400, 300, SendableGameState.TEXT_BLOCK_LIMIT, SendableGameState.TEXT_BLOCK_LINE_LIMIT + 1, "Edit Holo Projector",
+                                    "",
+                                    text, FontLibrary.FontSize.SMALL) {
+                                @Override
+                                public void onDeactivate() {
+                                    cm.suspend(false);
                                 }
 
                                 @Override
-                                public void pressedSecondOption() { //Player does not accept disclaimer
-                                    long index = piece.getTextBlockIndex();
-                                    int pos = -1;
-                                    for (int i = 0; i < piece.getSegmentController().getTextBlocks().size(); i++) {
-                                        if (piece.getSegmentController().getTextBlocks().get(i) == index) {
-                                            pos = i;
-                                            break;
-                                        }
-                                    }
-                                    if (pos != -1) piece.getSegmentController().getTextBlocks().remove(pos);
-                                    event.setCanceled(true);
+                                public String[] getCommandPrefixes() {
+                                    return null;
                                 }
+
+                                @Override
+                                public boolean onInput(String entry) {
+                                    SendableSegmentProvider ss = ((ClientSegmentProvider) piece.getSegment().getSegmentController().getSegmentProvider()).getSendableSegmentProvider();
+
+                                    TextBlockPair f = new TextBlockPair();
+
+                                    f.block = ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation());
+                                    f.text = entry;
+                                    System.err.println("[CLIENT]Text entry:\n\"" + f.text + "\"");
+                                    ss.getNetworkObject().textBlockResponsesAndChangeRequests.add(new RemoteTextBlockPair(f, false));
+
+                                    return true;
+                                }
+
+                                @Override
+                                public String handleAutoComplete(String s, TextCallback callback, String prefix) throws PrefixNotFoundException {
+                                    return null;
+                                }
+
+                                @Override
+                                public boolean isOccluded() {
+                                    return false;
+                                }
+
+
+                                @Override
+                                public void onFailedTextCheck(String msg) {
+                                }
+
+
                             };
-                            input.setDeactivateOnEscape(false);
-                            input.getInputPanel().onInit();
-                            input.getInputPanel().setCancelButton(false);
 
-                            input.getInputPanel().setOkButton(true);
-                            input.getInputPanel().setOkButtonText("ACCEPT");
-
-                            input.getInputPanel().setSecondOptionButton(true);
-                            input.getInputPanel().setSecondOptionButtonText("DECLINE");
-
-                            input.getInputPanel().background.setPos(470.0F, 35.0F, 0.0F);
-                            input.getInputPanel().background.setWidth((float) (GLFrame.getWidth() - 435));
-                            input.getInputPanel().background.setHeight((float) (GLFrame.getHeight() - 70));
-                            input.activate();
+                            t.getTextInput().setAllowEmptyEntry(true);
+                            t.getInputPanel().onInit();
+                            t.activate();
                         }
-
-                        final PlayerInteractionControlManager cm = event.getControlManager();
-
-                        String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
-                        logImage(text, event.getPlayer());
-
-                        if (text == null) {
-                            text = "";
-                        }
-
-                        final PlayerTextAreaInput t = new PlayerTextAreaInput("EDIT_DISPLAY_BLOCK_POPUP", cm.getState(), 400, 300, SendableGameState.TEXT_BLOCK_LIMIT, SendableGameState.TEXT_BLOCK_LINE_LIMIT + 1, "Edit Holo Projector",
-                                "",
-                                text, FontLibrary.FontSize.SMALL) {
-                            @Override
-                            public void onDeactivate() {
-                                cm.suspend(false);
-                            }
-
-                            @Override
-                            public String[] getCommandPrefixes() {
-                                return null;
-                            }
-
-                            @Override
-                            public boolean onInput(String entry) {
-                                SendableSegmentProvider ss = ((ClientSegmentProvider) piece.getSegment().getSegmentController().getSegmentProvider()).getSendableSegmentProvider();
-
-                                TextBlockPair f = new TextBlockPair();
-
-                                f.block = ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation());
-                                f.text = entry;
-                                System.err.println("[CLIENT]Text entry:\n\"" + f.text + "\"");
-                                ss.getNetworkObject().textBlockResponsesAndChangeRequests.add(new RemoteTextBlockPair(f, false));
-
-                                return true;
-                            }
-
-                            @Override
-                            public String handleAutoComplete(String s, TextCallback callback, String prefix) throws PrefixNotFoundException {
-                                return null;
-                            }
-
-                            @Override
-                            public boolean isOccluded() {
-                                return false;
-                            }
-
-
-                            @Override
-                            public void onFailedTextCheck(String msg) {
-                            }
-
-
-                        };
-
-                        t.getTextInput().setAllowEmptyEntry(true);
-                        t.getInputPanel().onInit();
-                        t.activate();
                     }
                 }
             }
         }, this);
 
-        //Register text blocks on block place
         StarLoader.registerListener(SegmentPieceAddEvent.class, new Listener<SegmentPieceAddEvent>() {
             @Override
             public void onEvent(SegmentPieceAddEvent event) {
@@ -329,7 +351,6 @@ public class StarMadePlus extends StarMod {
             }
         }, this);
 
-        //Remove text block on block remove
         StarLoader.registerListener(SegmentPieceRemoveEvent.class, new Listener<SegmentPieceRemoveEvent>() {
             @Override
             public void onEvent(SegmentPieceRemoveEvent event) {
@@ -363,6 +384,7 @@ public class StarMadePlus extends StarMod {
         this.maxImageOffset = config.getConfigurableFloat("max-image-offset", 30);
         this.imageFilterMode = ImageFilterMode.valueOf(config.getString("image-filter-mode").toUpperCase());
         this.imageFilter = config.getList("image-filter");
+        this.tacticalMapMaxViewDistance = config.getInt("tactical-map-max-view-distance");
 
         DebugFile.log("Loaded Config", this);
     }
@@ -381,11 +403,23 @@ public class StarMadePlus extends StarMod {
     }
 
     private void loadBlockModels() {
-        try {
-            String modelsFolder = "resource/models/";
-            Controller.getResLoader().loadModelDirectly("DisplayScreen", StarMadePlus.class.getResource(modelsFolder + "DisplayScreen").getPath(), "DisplayScreen");
-        } catch (Exception e) {
-            e.printStackTrace();
+        final GameResourceLoader resLoader = (GameResourceLoader) Controller.getResLoader();
+
+        String[] models = new String[] {
+                "displayscreen"
+        };
+
+        for(final String model : models) {
+            StarLoaderTexture.runOnGraphicsThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        resLoader.getMeshLoader().loadModMesh(StarMadePlus.this, model, StarMadePlus.class.getResourceAsStream("resource/models/" + model + ".zip"), null);
+                    } catch (ResourceException | IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
     }
 

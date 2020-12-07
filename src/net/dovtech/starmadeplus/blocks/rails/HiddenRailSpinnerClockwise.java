@@ -1,13 +1,15 @@
-package net.dovtech.starmadeplus.blocks;
+package net.dovtech.starmadeplus.blocks.rails;
 
 import api.config.BlockConfig;
 import api.element.block.Blocks;
+import net.dovtech.starmadeplus.blocks.BlockElement;
+import net.dovtech.starmadeplus.blocks.BlockManager;
 import org.schema.game.common.data.element.FactoryResource;
 
 public class HiddenRailSpinnerClockwise extends BlockElement {
 
     public HiddenRailSpinnerClockwise(BlockConfig config) {
-        super(config, "Hidden Rail Spinner Clock Wise", BlockManager.BlockSide.TOP_ONLY);
+        super(config, "Hidden Rail Spinner Clock Wise", BlockManager.TextureType.TOP_ONLY);
         blockInfo.setInRecipe(true);
         blockInfo.canActivate = true;
         blockInfo.setPrice(Blocks.RAIL_ROTATOR_CLOCK_WISE.getInfo().price);
