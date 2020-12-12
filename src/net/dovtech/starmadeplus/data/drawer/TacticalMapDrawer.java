@@ -2,19 +2,17 @@ package net.dovtech.starmadeplus.data.drawer;
 
 import api.common.GameClient;
 import com.bulletphysics.linearmath.Transform;
-import net.dovtech.starmadeplus.data.TacticalMapPos;
+import net.dovtech.starmadeplus.data.map.TacticalMapPos;
 import net.dovtech.starmadeplus.data.camera.TacticalViewCamera;
 import org.schema.game.client.data.GameClientState;
 import org.schema.schine.common.InputHandler;
 import org.schema.schine.graphicsengine.core.Drawable;
 import org.schema.schine.graphicsengine.core.GlUtil;
 import org.schema.schine.graphicsengine.core.MouseEvent;
-import org.schema.schine.graphicsengine.forms.Transformable;
 import org.schema.schine.input.KeyEventInterface;
 import org.schema.schine.input.KeyboardMappings;
 
 import javax.vecmath.Vector3f;
-import java.util.List;
 
 public class TacticalMapDrawer implements Drawable, InputHandler {
 

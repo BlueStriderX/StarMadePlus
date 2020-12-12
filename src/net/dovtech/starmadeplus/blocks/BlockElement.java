@@ -68,13 +68,47 @@ public abstract class BlockElement {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        } else if(textureSides.length == 1 && textureSides[0] == BlockManager.TextureType.MODULE) {
+            try {
+                String frontName = name.toLowerCase().replaceAll(" ", "_") + "_front";
+                String topName = name.toLowerCase().replaceAll(" ", "_") + "_top";
+                String bottomName = name.toLowerCase().replaceAll(" ", "_") + "_bottom";
+                String sidesName = name.toLowerCase().replaceAll(" ", "_") + "_sides";
+
+                StarLoaderTexture frontTexture = StarMadePlus.getInstance().textures.get(frontName);
+                StarLoaderTexture topTexture = StarMadePlus.getInstance().textures.get(topName);
+                StarLoaderTexture bottomTexture = StarMadePlus.getInstance().textures.get(bottomName);
+                StarLoaderTexture sidesTexture = StarMadePlus.getInstance().textures.get(sidesName);
+
+                textureIDs[0] = (short) sidesTexture.getTextureId();
+                textureIDs[1] = (short) frontTexture.getTextureId();
+                textureIDs[2] = (short) topTexture.getTextureId();
+                textureIDs[3] = (short) bottomTexture.getTextureId();
+                textureIDs[4] = (short) sidesTexture.getTextureId();
+                textureIDs[5] = (short) sidesTexture.getTextureId();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else if(textureSides.length == 1 && textureSides[0] == BlockManager.TextureType.COMPUTER) {
             try {
-                for(int i = 0; i < 6; i ++) {
-                    String textureName = name.toLowerCase().replaceAll(" ", "_") + "_" + blockSideNames[i];
-                    StarLoaderTexture texture = StarMadePlus.getInstance().textures.get(textureName);
-                    textureIDs[i] = (short) texture.getTextureId();
-                }
+                String frontName = name.toLowerCase().replaceAll(" ", "_") + "_front";
+                String backName = name.toLowerCase().replaceAll(" ", "_") + "_back";
+                String topName = name.toLowerCase().replaceAll(" ", "_") + "_top";
+                String bottomName = name.toLowerCase().replaceAll(" ", "_") + "_bottom";
+                String sidesName = name.toLowerCase().replaceAll(" ", "_") + "_sides";
+
+                StarLoaderTexture frontTexture = StarMadePlus.getInstance().textures.get(frontName);
+                StarLoaderTexture backTexture = StarMadePlus.getInstance().textures.get(backName);
+                StarLoaderTexture topTexture = StarMadePlus.getInstance().textures.get(topName);
+                StarLoaderTexture bottomTexture = StarMadePlus.getInstance().textures.get(bottomName);
+                StarLoaderTexture sidesTexture = StarMadePlus.getInstance().textures.get(sidesName);
+
+                textureIDs[0] = (short) backTexture.getTextureId();
+                textureIDs[1] = (short) frontTexture.getTextureId();
+                textureIDs[2] = (short) topTexture.getTextureId();
+                textureIDs[3] = (short) bottomTexture.getTextureId();
+                textureIDs[4] = (short) sidesTexture.getTextureId();
+                textureIDs[5] = (short) sidesTexture.getTextureId();
             } catch (Exception e) {
                 e.printStackTrace();
             }

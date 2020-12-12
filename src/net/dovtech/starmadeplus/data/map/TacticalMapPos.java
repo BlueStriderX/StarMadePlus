@@ -1,4 +1,4 @@
-package net.dovtech.starmadeplus.data;
+package net.dovtech.starmadeplus.data.map;
 
 import com.bulletphysics.linearmath.Transform;
 import net.dovtech.starmadeplus.StarMadePlus;

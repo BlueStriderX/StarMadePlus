@@ -25,7 +25,6 @@ public class StellarLifterController extends BlockElement {
                 new FactoryResource(1, BlockManager.getFromName("Photon Shard").getId())
 
         );
-
         config.add(blockInfo);
     }
 }

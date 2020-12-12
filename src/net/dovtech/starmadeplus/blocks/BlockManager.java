@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 public class BlockManager {
 
-    public enum TextureType {ALL, MODEL, MULTIBLOCK, TOP_BOTTOM, TOP_ONLY, COMPUTER, FRONT, BACK, TOP, BOTTOM, RIGHT, LEFT}
+    public enum TextureType {ALL, MODEL, MULTIBLOCK, TOP_BOTTOM, TOP_ONLY, COMPUTER, MODULE, FRONT, BACK, TOP, BOTTOM, RIGHT, LEFT}
 
     private static ArrayList<BlockElement> blocks = new ArrayList<>();
     public static HashMap<String, Integer> customFactories = new HashMap<>();
