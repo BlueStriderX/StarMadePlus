@@ -305,8 +305,6 @@ public class PlasmaLauncherElementManager extends UsableCombinableControllableEl
                             return new PlasmaBallParticle(shootContainer.shootingDirTemp, unit);
                         }
                     });
-                    //Todo:Spawn WeaponProjectile
-
 
                     handleResponse(ShootingRespose.FIRED, unit, shootContainer.weapontOutputWorldPos);
                 } else {

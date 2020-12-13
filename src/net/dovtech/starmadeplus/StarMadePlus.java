@@ -62,7 +62,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -72,8 +71,6 @@ public class StarMadePlus extends StarMod {
 
     //Other
     private static StarMadePlus instance;
-
-    public enum GameMode {CLIENT, SERVER, SINGLEPLAYER}
 
     public enum ImageFilterMode {BLACKLIST, WHITELIST}
 
@@ -91,7 +88,7 @@ public class StarMadePlus extends StarMod {
     private File imageLogFile;
 
     //Config
-    private String[] defaultConfig = {
+    private final String[] defaultConfig = {
             "debug-mode: false",
             "max-display-draw-distance: 75",
             "max-image-scale: 15",
@@ -99,6 +96,17 @@ public class StarMadePlus extends StarMod {
             "image-filter-mode: blacklist",
             "image-filter: porn,hentai,sex,nsfw",
             "tactical-map-max-view-distance: 3"
+    };
+    private final String[] textureNames = new String[] {
+            //Weapons
+            "plasma_launcher_computer_front",
+            "plasma_launcher_computer_back",
+            "plasma_launcher_computer_top",
+            "plasma_launcher_computer_bottom",
+            "plasma_launcher_computer_sides",
+            "plasma_launcher_barrel_front",
+            "plasma_launcher_barrel_sides_horizontal",
+            "plasma_launcher_barrel_sides_vertical"
     };
     public boolean debugMode = false;
     public int maxDisplayDrawDistance = 50;
@@ -161,7 +169,7 @@ public class StarMadePlus extends StarMod {
         registerListeners();
         loadBlockModels();
         loadTextures();
-        if (getGameState().equals(GameMode.SERVER) || getGameState().equals(GameMode.SINGLEPLAYER)) {
+        if (GameCommon.isDedicatedServer() || GameCommon.isOnSinglePlayer()) {
             initConfig();
             createLogs();
         }
@@ -193,7 +201,7 @@ public class StarMadePlus extends StarMod {
             @Override
             public void onEvent(final SegmentPieceActivateByPlayer event) {
                 final SegmentPiece piece = event.getSegmentPiece();
-                if (getGameState().equals(GameMode.SERVER) || getGameState().equals(GameMode.SINGLEPLAYER)) {
+                if (GameCommon.isDedicatedServer() || GameCommon.isOnSinglePlayer()) {
                     if (piece.getType() == Blocks.DISPLAY_MODULE.getId()) {
                         final PlayerState player = event.getPlayer();
                         ArrayList<Object> playerList = PersistentObjectUtil.getObjects(StarMadePlus.getInstance(), String.class);
@@ -506,7 +514,7 @@ public class StarMadePlus extends StarMod {
     private void loadBlockModels() {
         final GameResourceLoader resLoader = (GameResourceLoader) Controller.getResLoader();
 
-        String[] models = new String[]{
+        String[] models = new String[] {
                 "displayscreen"
         };
 
@@ -526,31 +534,16 @@ public class StarMadePlus extends StarMod {
 
     private void loadTextures() {
         try {
-            //String texturesFolder = "/resource/textures/blocks/";
-            URL url = StarMadePlus.class.getResource("resource/textures/blocks");
-            File texturesFolder = new File(url.getFile());
-            for (File file : Objects.requireNonNull(texturesFolder.listFiles())) {
-                textures.put(file.getName().split(".png")[0], StarLoaderTexture.newBlockTexture(ImageIO.read(file)));
+            for(String textureName : textureNames) {
+                textures.put(textureName, StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream("resource/textures/blocks/" + textureName + ".png"))));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public GameMode getGameState() {
-        if (GameCommon.isDedicatedServer()) {
-            return GameMode.SERVER;
-        } else if (GameCommon.isOnSinglePlayer()) {
-            return GameMode.SINGLEPLAYER;
-        } else if (GameCommon.isClientConnectedToServer()) {
-            return GameMode.CLIENT;
-        } else {
-            return GameMode.CLIENT;
-        }
-    }
-
     public void logAdmin(String message, LogType logType) {
-        if (getGameState().equals(GameMode.SERVER) || getGameState().equals(GameMode.SINGLEPLAYER)) {
+        if (GameCommon.isDedicatedServer() || GameCommon.isOnSinglePlayer()) {
             try {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(adminLogFile, true));
                 switch (logType) {
@@ -579,7 +572,7 @@ public class StarMadePlus extends StarMod {
     }
 
     public void logImage(String text, PlayerState player) {
-        if (getGameState().equals(GameMode.SERVER) || getGameState().equals(GameMode.SINGLEPLAYER)) {
+        if (GameCommon.isDedicatedServer() || GameCommon.isOnSinglePlayer()) {
             try {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(imageLogFile, true));
                 writer.append(player.getName()).append(" posted an image ").append(text).append("on a display module.");
