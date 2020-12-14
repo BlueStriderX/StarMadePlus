@@ -31,7 +31,7 @@ public class PlasmaBallParticle extends ModParticle {
     public void update(long currentTime) {
         if(!projectile.isFired()) {
             if(unit.elementCollectionManager.damageCharge < unit.elementCollectionManager.getDamageChargeMax()) {
-                sizeOverTime(this, 100, unit.elementCollectionManager.damageSize, unit.elementCollectionManager.damageSize + 0.35f);
+                sizeByPercent(this, unit.elementCollectionManager.damageCharge, unit.elementCollectionManager.damageSize, unit.elementCollectionManager.damageSize + 0.1f);
             }
         } else {
             if(velocity.equals(new Vector3f(0, 0, 0))) {

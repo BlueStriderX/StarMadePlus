@@ -60,7 +60,7 @@ public class PlasmaLauncherElementManager extends UsableCombinableControllableEl
     public static float BASE_DISTANCE = 500;
 
     @ConfigurationElement(name = "Speed")
-    public static float BASE_SPEED = 7.5f;
+    public static float BASE_SPEED = 4.0f;
 
     @ConfigurationElement(name = "ReloadMs")
     public static float BASE_RELOAD = 1200;
@@ -132,7 +132,7 @@ public class PlasmaLauncherElementManager extends UsableCombinableControllableEl
     public static float DAMAGE_CHARGE_MAX = 1.0f;
 
     @ConfigurationElement(name = "DamageChargeSpeed")
-    public static float DAMAGE_CHARGE_SPEED = 0.035f;
+    public static float DAMAGE_CHARGE_SPEED = 0.1f;
 
     @ConfigurationElement(name = "DamageChargeMaxSize")
     public static float DAMAGE_CHARGE_MAX_SIZE = 7.5f;

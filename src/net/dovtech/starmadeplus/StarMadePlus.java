@@ -175,10 +175,8 @@ public class StarMadePlus extends StarMod {
         //loadBlockModels();
         loadTextures();
         ParticleManager.init(this);
-        if (GameCommon.isDedicatedServer() || GameCommon.isOnSinglePlayer()) {
-            initConfig();
-            createLogs();
-        }
+        initConfig();
+        createLogs();
         super.onEnable();
     }
 
