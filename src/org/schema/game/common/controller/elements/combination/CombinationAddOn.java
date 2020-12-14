@@ -10,7 +10,7 @@ import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.Random;
 
-import net.dovtech.starmadeplus.systems.weapons.plasmalauncher.PlasmaLauncherCollectionManager;
+import net.dovtech.starmadeplus.weapons.plasmalauncher.PlasmaLauncherCollectionManager;
 import org.schema.common.config.ConfigParserException;
 import org.schema.common.config.ConfigurationElement;
 import org.schema.game.client.data.GameClientState;

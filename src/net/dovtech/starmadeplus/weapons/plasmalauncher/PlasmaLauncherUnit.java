@@ -1,4 +1,4 @@
-package net.dovtech.starmadeplus.systems.weapons.plasmalauncher;
+package net.dovtech.starmadeplus.weapons.plasmalauncher;
 
 import org.schema.game.client.data.GameClientState;
 import org.schema.game.client.data.GameStateInterface;

@@ -1,4 +1,4 @@
-package net.dovtech.starmadeplus.systems.weapons.plasmalauncher;
+package net.dovtech.starmadeplus.weapons.plasmalauncher;
 
 import net.dovtech.starmadeplus.blocks.BlockManager;
 import org.schema.game.client.data.GameClientState;

@@ -2,7 +2,7 @@ package net.dovtech.starmadeplus.data.particles;
 
 import api.utils.particle.ModParticle;
 import net.dovtech.starmadeplus.data.physics.projectile.PlasmaBallProjectile;
-import net.dovtech.starmadeplus.systems.weapons.plasmalauncher.PlasmaLauncherUnit;
+import net.dovtech.starmadeplus.weapons.plasmalauncher.PlasmaLauncherUnit;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 

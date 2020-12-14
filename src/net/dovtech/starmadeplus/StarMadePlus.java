@@ -27,7 +27,7 @@ import net.dovtech.starmadeplus.data.mesh.MeshDrawData;
 import net.dovtech.starmadeplus.data.particles.ParticleManager;
 import net.dovtech.starmadeplus.listener.RailMoveEvent;
 import net.dovtech.starmadeplus.listener.TextDrawEvent;
-import net.dovtech.starmadeplus.systems.weapons.plasmalauncher.PlasmaLauncherElementManager;
+import net.dovtech.starmadeplus.weapons.plasmalauncher.PlasmaLauncherElementManager;
 import net.dovtech.starmadeplus.utils.ElementGroupMeshUtils;
 import net.dovtech.starmadeplus.utils.MultiblockUtils;
 import org.schema.game.client.controller.PlayerOkCancelInput;
@@ -121,7 +121,6 @@ public class StarMadePlus extends StarMod {
     public ArrayList<String> imageFilter = new ArrayList<>();
     public int tacticalMapMaxViewDistance = 3;
 
-
     public StarMadePlus() {
         instance = this;
     }
@@ -132,9 +131,9 @@ public class StarMadePlus extends StarMod {
     @Override
     public void onGameStart() {
         setModName("StarMadePlus");
-        setModVersion("0.6.2");
+        setModVersion("0.6.3");
         setModAuthor("Dovtech");
-        setModDescription("Minor tweaks and additions to improve the base game.");
+        setModDescription("Expands on the vanilla experience while offering new systems and mechanics.");
         setModSMVersion("0.202.108");
     }
 

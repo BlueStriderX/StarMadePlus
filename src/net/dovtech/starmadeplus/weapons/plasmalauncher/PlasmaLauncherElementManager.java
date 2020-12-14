@@ -1,4 +1,4 @@
-package net.dovtech.starmadeplus.systems.weapons.plasmalauncher;
+package net.dovtech.starmadeplus.weapons.plasmalauncher;
 
 import api.utils.particle.ModParticle;
 import api.utils.particle.ModParticleFactory;

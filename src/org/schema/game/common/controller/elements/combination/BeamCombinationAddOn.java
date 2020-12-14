@@ -7,7 +7,7 @@ package org.schema.game.common.controller.elements.combination;
 
 import javax.vecmath.Vector3f;
 
-import net.dovtech.starmadeplus.systems.weapons.plasmalauncher.PlasmaLauncherCollectionManager;
+import net.dovtech.starmadeplus.weapons.plasmalauncher.PlasmaLauncherCollectionManager;
 import org.schema.common.FastMath;
 import org.schema.game.client.data.GameStateInterface;
 import org.schema.game.common.controller.BeamHandlerContainer;

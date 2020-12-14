@@ -2,8 +2,8 @@ package net.dovtech.starmadeplus.data.physics.projectile;
 
 import api.DebugFile;
 import net.dovtech.starmadeplus.StarMadePlus;
-import net.dovtech.starmadeplus.systems.weapons.plasmalauncher.PlasmaLauncherCollectionManager;
-import net.dovtech.starmadeplus.systems.weapons.plasmalauncher.PlasmaLauncherUnit;
+import net.dovtech.starmadeplus.weapons.plasmalauncher.PlasmaLauncherCollectionManager;
+import net.dovtech.starmadeplus.weapons.plasmalauncher.PlasmaLauncherUnit;
 import org.schema.game.common.controller.SegmentController;
 
 public class PlasmaBallProjectile extends WeaponProjectile {
