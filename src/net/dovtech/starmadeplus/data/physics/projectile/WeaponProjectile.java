@@ -9,9 +9,9 @@ import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.damage.Damager;
 import org.schema.game.common.controller.elements.FireingUnit;
 import org.schema.game.common.data.physics.*;
-import org.schema.game.common.data.player.ControllerStateInterface;
 import org.schema.game.common.data.world.Sector;
 import org.schema.game.server.data.GameServerState;
+import org.schema.schine.graphicsengine.core.MouseEvent;
 import org.schema.schine.network.StateInterface;
 import javax.vecmath.Vector3f;
 import java.util.Arrays;
@@ -122,7 +122,7 @@ public abstract class WeaponProjectile {
     }
 
     public boolean isShootButtonDown() {
-        return ((ControllerStateInterface) GameClient.getClientPlayerState().getControllerState().getState()).isPrimaryShootButtonDown();
+        return GameClient.getClientController().isMouseButtonDown(MouseEvent.ShootButton.PRIMARY_FIRE.getButton());
     }
 
     public abstract boolean isFired();

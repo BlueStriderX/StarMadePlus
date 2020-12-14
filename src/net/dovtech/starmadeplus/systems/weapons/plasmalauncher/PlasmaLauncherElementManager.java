@@ -13,6 +13,7 @@ import org.schema.common.config.ConfigurationElement;
 import org.schema.common.util.StringTools;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.client.data.GameClientState;
+import org.schema.game.client.data.GameStateInterface;
 import org.schema.game.client.view.camera.InShipCamera;
 import org.schema.game.client.view.gui.structurecontrol.ControllerManagerGUI;
 import org.schema.game.client.view.gui.structurecontrol.ModuleValueEntry;
@@ -52,6 +53,9 @@ public class PlasmaLauncherElementManager extends UsableCombinableControllableEl
     @ConfigurationElement(name = "Damage")
     public static FloatReactorDualConfigElement BASE_DAMAGE = new FloatReactorDualConfigElement();
 
+    @ConfigurationElement(name = "AdditiveDamage")
+    public static float ADDITIVE_DAMAGE = 7.0f;
+
     @ConfigurationElement(name = "Distance")
     public static float BASE_DISTANCE = 500;
 
@@ -62,10 +66,10 @@ public class PlasmaLauncherElementManager extends UsableCombinableControllableEl
     public static float BASE_RELOAD = 1200;
 
     @ConfigurationElement(name = "ImpactForce")
-    public static float IMPACT_FORCE = 0.05f;
+    public static float IMPACT_FORCE = 0.87f;
 
     @ConfigurationElement(name = "Recoil")
-    public static float RECOIL = 0.2f;
+    public static float RECOIL = 3.5f;
 
     @ConfigurationElement(name = "CursorRecoilX")
     public static float CURSOR_RECOIL_X = 0.0001f;
@@ -119,13 +123,13 @@ public class PlasmaLauncherElementManager extends UsableCombinableControllableEl
     public static float REACTOR_POWER_CONSUMPTION_CHARGING = 10;
 
     @ConfigurationElement(name = "AdditionalPowerConsumptionPerUnitMult")
-    public static float ADDITIONAL_POWER_CONSUMPTION_PER_UNIT_MULT = 0.1f;
+    public static float ADDITIONAL_POWER_CONSUMPTION_PER_UNIT_MULT = 0.0f;
 
     @ConfigurationElement(name = "EffectConfiguration")
     public static InterEffectSet basicEffectConfiguration = new InterEffectSet();
 
     @ConfigurationElement(name = "DamageChargeMax")
-    public static float DAMAGE_CHARGE_MAX = 0.1f;
+    public static float DAMAGE_CHARGE_MAX = 1.0f;
 
     @ConfigurationElement(name = "DamageChargeSpeed")
     public static float DAMAGE_CHARGE_SPEED = 0.035f;
@@ -138,6 +142,7 @@ public class PlasmaLauncherElementManager extends UsableCombinableControllableEl
 
     public PlasmaLauncherElementManager(SegmentController segmentController) {
         super(BlockManager.getFromName("Plasma Launcher Computer").getId(), BlockManager.getFromName("Plasma Launcher Barrel").getId(), segmentController);
+        addOn = new PlasmaLauncherCombinationAddOn(this, (GameStateInterface) this.getState());
     }
 
     public void handleRecoil(PlasmaLauncherCollectionManager collection, PlasmaLauncherUnit unit, Vector3f outputPos, Vector3f shootingDir, float outputRecoil, float damage) {

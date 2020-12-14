@@ -38,7 +38,7 @@ public class TextDrawEvent implements TextBoxDrawListener {
         for (SegmentDrawer.TextBoxSeg.TextBoxElement textBoxElement : seg.v) {
             if (textBoxElement.rawText.contains("<img>")) {
                 try {
-                    abstractTextBox.getBg().setSprite(StarLoaderTexture.newSprite(ImageIO.read(StarMadePlus.class.getResourceAsStream("resource/textures/transparent.png")), StarMadePlus.getInstance(), "transparent"));
+                    abstractTextBox.getBg().setSprite(StarLoaderTexture.newSprite(ImageIO.read(StarMadePlus.class.getResourceAsStream("particletextures/transparent.png")), StarMadePlus.getInstance(), "transparent"));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

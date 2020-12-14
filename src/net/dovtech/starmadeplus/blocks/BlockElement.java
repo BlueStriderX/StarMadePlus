@@ -78,8 +78,8 @@ public abstract class BlockElement {
                 StarLoaderTexture sidesHorizontalTexture = StarMadePlus.getInstance().textures.get(sidesHorizontalName);
                 StarLoaderTexture sidesVerticalTexture = StarMadePlus.getInstance().textures.get(sidesVerticalName);
 
-                textureIDs[0] = (short) sidesHorizontalTexture.getTextureId();
-                textureIDs[1] = (short) frontTexture.getTextureId();
+                textureIDs[0] = (short) frontTexture.getTextureId();
+                textureIDs[1] = (short) sidesHorizontalTexture.getTextureId();
                 textureIDs[2] = (short) sidesVerticalTexture.getTextureId();
                 textureIDs[3] = (short) sidesVerticalTexture.getTextureId();
                 textureIDs[4] = (short) sidesHorizontalTexture.getTextureId();

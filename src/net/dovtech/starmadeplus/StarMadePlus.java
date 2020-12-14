@@ -24,6 +24,7 @@ import net.dovtech.starmadeplus.blocks.weapons.PlasmaLauncherBarrel;
 import net.dovtech.starmadeplus.blocks.weapons.PlasmaLauncherComputer;
 import net.dovtech.starmadeplus.data.element.ElementGroup;
 import net.dovtech.starmadeplus.data.mesh.MeshDrawData;
+import net.dovtech.starmadeplus.data.particles.ParticleManager;
 import net.dovtech.starmadeplus.listener.RailMoveEvent;
 import net.dovtech.starmadeplus.listener.TextDrawEvent;
 import net.dovtech.starmadeplus.systems.weapons.plasmalauncher.PlasmaLauncherElementManager;
@@ -54,6 +55,7 @@ import org.schema.schine.graphicsengine.core.Controller;
 import org.schema.schine.graphicsengine.core.GLFrame;
 import org.schema.schine.graphicsengine.core.ResourceException;
 import org.schema.schine.graphicsengine.core.settings.PrefixNotFoundException;
+import org.schema.schine.graphicsengine.forms.Sprite;
 import org.schema.schine.graphicsengine.forms.font.FontLibrary;
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector3f;
@@ -77,6 +79,7 @@ public class StarMadePlus extends StarMod {
     public enum LogType {DEBUG, INFO, WARNING, ERROR, SEVERE}
 
     public HashMap<String, StarLoaderTexture> textures = new HashMap<>();
+    public HashMap<String, Sprite> particles = new HashMap<>();
     private final String disclaimerMessage =
             "By pressing the ACCEPT button, you hereby acknowledge any and all responsibility for the images you\n" +
                     "post and that the creators of StarMadePlus, the StarLoader team, Schine, the Server or its owners,\n" +
@@ -97,6 +100,7 @@ public class StarMadePlus extends StarMod {
             "image-filter: porn,hentai,sex,nsfw",
             "tactical-map-max-view-distance: 3"
     };
+
     private final String[] textureNames = new String[] {
             //Weapons
             "plasma_launcher_computer_front",
@@ -108,6 +112,7 @@ public class StarMadePlus extends StarMod {
             "plasma_launcher_barrel_sides_horizontal",
             "plasma_launcher_barrel_sides_vertical"
     };
+
     public boolean debugMode = false;
     public int maxDisplayDrawDistance = 50;
     public float maxImageScale = 15;
@@ -167,8 +172,9 @@ public class StarMadePlus extends StarMod {
         registerOverwrites();
         registerFastListeners();
         registerListeners();
-        loadBlockModels();
+        //loadBlockModels();
         loadTextures();
+        ParticleManager.init(this);
         if (GameCommon.isDedicatedServer() || GameCommon.isOnSinglePlayer()) {
             initConfig();
             createLogs();
@@ -535,7 +541,7 @@ public class StarMadePlus extends StarMod {
     private void loadTextures() {
         try {
             for(String textureName : textureNames) {
-                textures.put(textureName, StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream("resource/textures/blocks/" + textureName + ".png"))));
+                textures.put(textureName, StarLoaderTexture.newBlockTexture(ImageIO.read(StarMadePlus.class.getResourceAsStream("blocktextures/" + textureName + ".png"))));
             }
         } catch (Exception e) {
             e.printStackTrace();

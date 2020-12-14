@@ -22,7 +22,7 @@ public enum ParticleManager {
                         String name = value.name().toLowerCase();
                         value.name = name;
                         try {
-                            value.sprite = StarLoaderTexture.newSprite(ImageIO.read(StarMadePlus.class.getResourceAsStream("resource/textures/particles/" + name + ".png")), instance, "starmadeplus_" + name);
+                            value.sprite = StarLoaderTexture.newSprite(ImageIO.read(StarMadePlus.class.getResourceAsStream("particletextures/" + name + ".png")), instance, "starmadeplus_" + name);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }

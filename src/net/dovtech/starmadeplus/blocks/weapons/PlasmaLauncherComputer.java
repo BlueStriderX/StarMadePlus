@@ -14,8 +14,8 @@ public class PlasmaLauncherComputer extends BlockElement {
         blockInfo.canActivate = Blocks.TRACTOR_BEAM_COMPUTER.getInfo().canActivate;
         blockInfo.setShoppable(true);
         blockInfo.setPrice(Blocks.DAMAGE_PULSE_COMPUTER_0.getInfo().price);
-        blockInfo.controlling.add(BlockManager.getFromName("Plasma Launcher Barrel").getId());
-        blockInfo.controlledBy.addAll(Blocks.DAMAGE_PULSE_COMPUTER_0.getInfo().controlledBy);
+        //blockInfo.controlling.add(BlockManager.getFromName("Plasma Launcher Barrel").getId());
+        blockInfo.controlledBy.addAll(Blocks.DAMAGE_BEAM_COMPUTER_0.getInfo().controlledBy);
 
         BlockConfig.addRecipe(blockInfo, Blocks.DAMAGE_PULSE_COMPUTER_0.getInfo().getProducedInFactory(), (int) Blocks.DAMAGE_PULSE_COMPUTER_0.getInfo().getFactoryBakeTime(),
                 new FactoryResource(500, Blocks.FERTIKEEN_CAPSULE.getId()),

@@ -12,6 +12,9 @@ public class PlasmaLauncherUnitModifier extends Modifier<PlasmaLauncherUnit, Pla
     @ConfigurationElement(name = "Damage")
     public BasicModifier damageModifier;
 
+    @ConfigurationElement(name = "AdditiveDamage")
+    public BasicModifier additiveDamage;
+
     @ConfigurationElement(name = "Reload")
     public BasicModifier reloadModifier;
 
