@@ -55,7 +55,6 @@ import org.schema.schine.graphicsengine.core.Controller;
 import org.schema.schine.graphicsengine.core.GLFrame;
 import org.schema.schine.graphicsengine.core.ResourceException;
 import org.schema.schine.graphicsengine.core.settings.PrefixNotFoundException;
-import org.schema.schine.graphicsengine.forms.Sprite;
 import org.schema.schine.graphicsengine.forms.font.FontLibrary;
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector3f;
@@ -79,7 +78,6 @@ public class StarMadePlus extends StarMod {
     public enum LogType {DEBUG, INFO, WARNING, ERROR, SEVERE}
 
     public HashMap<String, StarLoaderTexture> textures = new HashMap<>();
-    public HashMap<String, Sprite> particles = new HashMap<>();
     private final String disclaimerMessage =
             "By pressing the ACCEPT button, you hereby acknowledge any and all responsibility for the images you\n" +
                     "post and that the creators of StarMadePlus, the StarLoader team, Schine, the Server or its owners,\n" +
