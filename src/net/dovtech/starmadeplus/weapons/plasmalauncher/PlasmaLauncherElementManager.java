@@ -297,12 +297,16 @@ public class PlasmaLauncherElementManager extends UsableCombinableControllableEl
         } else {
             boolean canUse = unit.canUse(timer.currentTime, false);
             if (canUse) {
-                final long weaponId = collection.getUsableId();
                 if (isUsingPowerReactors() || consumePower(unit.getPowerConsumption())) {
                     unit.setStandardShotReloading();
 
                     handleRecoil(collection, unit, shootContainer.weapontOutputWorldPos, shootContainer.shootingDirTemp, unit.getRecoil(), unit.getDamage());
                     collection.damageProduced += unit.getDamage();
+
+                    if(collection.particle != null) {
+                        collection.particle.direction = shootContainer.weapontOutputWorldPos;
+                        collection.particle.fire();
+                    }
 
                     ModParticleUtil.playClient(shootContainer.weapontOutputWorldPos, ParticleManager.PLASMA_BALL.getSprite(), 1, PLASMA_BALL_MAX_LIFETIME, shootContainer.shootingDirTemp, new ModParticleFactory() {
                         @Override

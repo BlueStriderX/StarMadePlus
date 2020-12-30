@@ -125,7 +125,5 @@ public abstract class WeaponProjectile {
         return GameClient.getClientController().isMouseButtonDown(MouseEvent.ShootButton.PRIMARY_FIRE.getButton());
     }
 
-    public abstract boolean isFired();
-
     public abstract void handleCollision();
 }

@@ -13,6 +13,7 @@ public class PlasmaLauncherBarrel extends BlockElement {
         blockInfo.setInRecipe(true);
         blockInfo.setShoppable(true);
         blockInfo.setPrice(Blocks.DAMAGE_PULSE_MODULE_0.getInfo().price);
+        blockInfo.setCanActivate(true);
         //blockInfo.controlledBy.add(BlockManager.getFromName("Plasma Launcher Computer").getId());
 
         BlockConfig.addRecipe(blockInfo, Blocks.DAMAGE_PULSE_MODULE_0.getInfo().getProducedInFactory(), (int) Blocks.DAMAGE_PULSE_MODULE_0.getInfo().getFactoryBakeTime(),

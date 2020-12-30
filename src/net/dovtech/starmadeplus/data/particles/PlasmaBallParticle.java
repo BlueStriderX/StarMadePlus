@@ -9,16 +9,18 @@ import javax.vecmath.Vector4f;
 public class PlasmaBallParticle extends ModParticle {
 
     private float size;
-    private Vector3f direction;
+    public Vector3f direction;
     private Vector4f color;
     private PlasmaLauncherUnit unit;
     private PlasmaBallProjectile projectile;
+    private boolean fired;
 
     public PlasmaBallParticle(Vector3f direction, PlasmaLauncherUnit unit) {
         this.size = 1.0f;
         this.direction = direction;
         this.unit = unit;
         this.color = unit.getColor();
+        this.fired = false;
     }
 
     @Override
@@ -29,14 +31,12 @@ public class PlasmaBallParticle extends ModParticle {
 
     @Override
     public void update(long currentTime) {
-        if(!projectile.isFired()) {
+        if(!fired) {
             if(unit.elementCollectionManager.damageCharge < unit.elementCollectionManager.getDamageChargeMax()) {
                 sizeByPercent(this, unit.elementCollectionManager.damageCharge, unit.elementCollectionManager.damageSize, unit.elementCollectionManager.damageSize + 0.1f);
             }
         } else {
-            if(velocity.equals(new Vector3f(0, 0, 0))) {
-                velocity.set(direction);
-            } else {
+            if(!velocity.equals(new Vector3f(0, 0, 0))) {
                 boolean collision = projectile.checkCollision(unit.getSegmentController(), position, true);
                 if(collision) {
                     projectile.handleCollision();
@@ -48,5 +48,10 @@ public class PlasmaBallParticle extends ModParticle {
                 }
             }
         }
+    }
+
+    public void fire() {
+        velocity.set(direction);
+        fired = true;
     }
 }

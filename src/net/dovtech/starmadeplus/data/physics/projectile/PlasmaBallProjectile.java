@@ -8,16 +8,8 @@ import org.schema.game.common.controller.SegmentController;
 
 public class PlasmaBallProjectile extends WeaponProjectile {
 
-    private PlasmaLauncherCollectionManager collectionManager;
-
     public PlasmaBallProjectile(PlasmaLauncherUnit unit) {
         super(unit);
-        this.collectionManager = unit.elementCollectionManager;
-    }
-
-    @Override
-    public boolean isFired() {
-        return (!isShootButtonDown() && collectionManager.damageCharge > 0 && collectionManager.damageCharge <= collectionManager.getDamageChargeMax());
     }
 
     @Override

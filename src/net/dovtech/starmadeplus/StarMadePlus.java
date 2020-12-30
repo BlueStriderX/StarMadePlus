@@ -173,7 +173,7 @@ public class StarMadePlus extends StarMod {
         loadTextures();
         ParticleManager.init(this);
         initConfig();
-        createLogs();
+        //createLogs();
         super.onEnable();
     }
 

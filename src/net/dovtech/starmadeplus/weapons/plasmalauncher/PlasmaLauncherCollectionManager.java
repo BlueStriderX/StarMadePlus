@@ -1,6 +1,11 @@
 package net.dovtech.starmadeplus.weapons.plasmalauncher;
 
+import api.utils.particle.ModParticle;
+import api.utils.particle.ModParticleFactory;
+import api.utils.particle.ModParticleUtil;
 import net.dovtech.starmadeplus.blocks.BlockManager;
+import net.dovtech.starmadeplus.data.particles.ParticleManager;
+import net.dovtech.starmadeplus.data.particles.PlasmaBallParticle;
 import org.schema.game.client.data.GameClientState;
 import org.schema.game.client.view.gui.shiphud.newhud.HudContextHelpManager;
 import org.schema.game.client.view.gui.shiphud.newhud.HudContextHelperContainer;
@@ -18,6 +23,8 @@ import org.schema.schine.graphicsengine.core.Timer;
 import org.schema.schine.graphicsengine.core.settings.ContextFilter;
 import org.schema.schine.input.InputType;
 
+import javax.vecmath.Vector3f;
+
 public class PlasmaLauncherCollectionManager extends ControlBlockElementCollectionManager<PlasmaLauncherUnit, PlasmaLauncherCollectionManager, PlasmaLauncherElementManager> implements PlayerUsableInterface, EffectChangeHanlder {
 
     public float currentDamageMult = 1;
@@ -27,6 +34,7 @@ public class PlasmaLauncherCollectionManager extends ControlBlockElementCollecti
     private float speedMax;
     private float distanceMax;
     private InterEffectSet effectConfiguration = new InterEffectSet(PlasmaLauncherElementManager.basicEffectConfiguration);
+    public PlasmaBallParticle particle = null;
 
     public PlasmaLauncherCollectionManager(SegmentPiece segmentPiece, SegmentController segmentController, PlasmaLauncherElementManager plasmaLauncherElementManager) {
         super(segmentPiece, BlockManager.getFromName("Plasma Launcher Computer").getId(), segmentController, plasmaLauncherElementManager);
@@ -118,6 +126,20 @@ public class PlasmaLauncherCollectionManager extends ControlBlockElementCollecti
             }
 
             if (!anyReloading && damageCharge < prms.damageChargeMax) {
+                /*
+                if (particle == null) {
+                    final PlasmaLauncherUnit unit = getInstance();
+                    final Vector3f outputPos = unit.getOutput().toVector3f();
+                    ModParticleUtil.playClient(outputPos, ParticleManager.PLASMA_BALL.getSprite(), 1, PlasmaLauncherElementManager.PLASMA_BALL_MAX_LIFETIME, outputPos, new ModParticleFactory() {
+                        @Override
+                        public ModParticle newParticle() {
+                            particle = new PlasmaBallParticle(outputPos, unit);
+                            return particle;
+                        }
+                    });
+                }
+                 */
+
                 damageCharge = Math.min(prms.damageChargeMax, damageCharge + timer.getDelta() * prms.damageChargeSpeed);
                 damageSize = Math.min(prms.damageChargeMaxSize, damageSize + timer.getDelta() * prms.damageChargeSpeed);
             }
@@ -136,6 +158,7 @@ public class PlasmaLauncherCollectionManager extends ControlBlockElementCollecti
             damageCharge = 0;
             damageSize = 0;
             this.currentDamageMult = 1;
+            particle = null;
         }
     }
 
