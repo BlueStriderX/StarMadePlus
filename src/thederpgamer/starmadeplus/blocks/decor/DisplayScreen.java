@@ -11,6 +11,10 @@ public class DisplayScreen extends BlockElement {
 
     public DisplayScreen() {
         super("Display Screen", BlockManager.TextureType.MODEL);
+    }
+
+    @Override
+    public void initialize() {
         blockInfo.setInRecipe(true);
         blockInfo.canActivate = true;
         blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price);

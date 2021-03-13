@@ -27,4 +27,8 @@ public class BlockManager {
     public static void addBlock(BlockElement blockElement) {
         blocks.add(blockElement);
     }
+
+    public static void initializeBlocks() {
+        for(BlockElement blockElement : blocks) blockElement.initialize();
+    }
 }

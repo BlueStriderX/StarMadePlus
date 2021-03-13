@@ -10,6 +10,10 @@ public class DeepStorageComponent extends BlockElement {
 
     public DeepStorageComponent() {
         super("Deep Storage Component", BlockManager.TextureType.MULTIBLOCK);
+    }
+
+    @Override
+    public void initialize() {
         blockInfo.setInRecipe(true);
         blockInfo.canActivate = true;
         blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.STASH_ELEMENT).price * 2);

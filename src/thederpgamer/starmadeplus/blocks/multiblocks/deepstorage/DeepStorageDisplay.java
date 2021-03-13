@@ -10,6 +10,10 @@ public class DeepStorageDisplay extends BlockElement {
 
     public DeepStorageDisplay() {
         super("Deep Storage Display", BlockManager.TextureType.MULTIBLOCK);
+    }
+
+    @Override
+    public void initialize() {
         blockInfo.setInRecipe(true);
         blockInfo.canActivate = true;
         blockInfo.setPrice((long) (ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price * 2.5));
@@ -26,7 +30,6 @@ public class DeepStorageDisplay extends BlockElement {
                 new FactoryResource(1, BlockManager.getFromName("Deep Storage Component").getId()),
                 new FactoryResource(1, ElementKeyMap.TEXT_BOX)
         );
-
         BlockConfig.add(blockInfo);
     }
 }

@@ -10,6 +10,10 @@ public class HiddenRailSpinnerClockwise extends BlockElement {
 
     public HiddenRailSpinnerClockwise() {
         super("Hidden Rail Spinner Clock Wise", BlockManager.TextureType.TOP_ONLY);
+    }
+
+    @Override
+    public void initialize() {
         blockInfo.setInRecipe(true);
         blockInfo.canActivate = true;
         blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.RAIL_BLOCK_CW).price);

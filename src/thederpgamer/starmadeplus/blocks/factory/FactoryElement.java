@@ -16,7 +16,7 @@ public abstract class FactoryElement {
         try {
             for(int i = 0; i < 6; i ++) {
                 String textureName = name.toLowerCase().replaceAll(" ", "_") + "_" + blockSideNames[i];
-                StarLoaderTexture texture = StarMadePlus.getInstance().textures.get(textureName);
+                StarLoaderTexture texture = StarMadePlus.getInstance().textureMap.get(textureName);
                 textureIDs[i] = (short) texture.getTextureId();
             }
         } catch (Exception e) {

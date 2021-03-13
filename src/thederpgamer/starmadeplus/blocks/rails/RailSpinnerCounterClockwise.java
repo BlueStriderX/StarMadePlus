@@ -10,6 +10,10 @@ public class RailSpinnerCounterClockwise extends BlockElement {
 
     public RailSpinnerCounterClockwise() {
         super("Rail Spinner Counter Clock Wise", BlockManager.TextureType.TOP_BOTTOM);
+    }
+
+    @Override
+    public void initialize() {
         blockInfo.setInRecipe(true);
         blockInfo.canActivate = true;
         blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.RAIL_BLOCK_CCW).price);

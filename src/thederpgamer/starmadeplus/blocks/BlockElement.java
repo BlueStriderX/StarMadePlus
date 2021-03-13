@@ -16,7 +16,7 @@ public abstract class BlockElement {
                 int index;
                 for (index = 0; index < textureSides.length; index ++) {
                     String textureName = name.toLowerCase().replaceAll(" ", "_") + "_" + textureSides[index].name().toLowerCase();
-                    StarLoaderTexture texture = StarMadePlus.getInstance().textures.get(textureName);
+                    StarLoaderTexture texture = StarMadePlus.getInstance().textureMap.get(textureName);
                     textureIDs[index] = (short) texture.getTextureId();
                 }
             } catch (Exception e) {
@@ -25,7 +25,7 @@ public abstract class BlockElement {
         } else if(textureSides.length == 1 && textureSides[0] == BlockManager.TextureType.ALL) {
             try {
                 String textureName = name.toLowerCase().replaceAll(" ", "_");
-                StarLoaderTexture texture = StarMadePlus.getInstance().textures.get(textureName);
+                StarLoaderTexture texture = StarMadePlus.getInstance().textureMap.get(textureName);
                 short textureID = (short) texture.getTextureId();
                 textureIDs = new short[] {textureID, textureID, textureID, textureID, textureID, textureID};
             } catch (Exception e) {
@@ -36,8 +36,8 @@ public abstract class BlockElement {
                     String topName = name.toLowerCase().replaceAll(" ", "_") + "_top";
                     String sidesName = name.toLowerCase().replaceAll(" ", "_") + "_sides";
 
-                    StarLoaderTexture topTexture =  StarMadePlus.getInstance().textures.get(topName);
-                    StarLoaderTexture sidesTexture = StarMadePlus.getInstance().textures.get(sidesName);
+                    StarLoaderTexture topTexture =  StarMadePlus.getInstance().textureMap.get(topName);
+                    StarLoaderTexture sidesTexture = StarMadePlus.getInstance().textureMap.get(sidesName);
 
                     textureIDs[0] = (short) sidesTexture.getTextureId();
                     textureIDs[1] = (short) sidesTexture.getTextureId();
@@ -54,9 +54,9 @@ public abstract class BlockElement {
                 String bottomName = name.toLowerCase().replaceAll(" ", "_") + "_bottom";
                 String sidesName = name.toLowerCase().replaceAll(" ", "_") + "_sides";
 
-                StarLoaderTexture topTexture = StarMadePlus.getInstance().textures.get(topName);
-                StarLoaderTexture bottomTexture = StarMadePlus.getInstance().textures.get(bottomName);
-                StarLoaderTexture sidesTexture = StarMadePlus.getInstance().textures.get(sidesName);
+                StarLoaderTexture topTexture = StarMadePlus.getInstance().textureMap.get(topName);
+                StarLoaderTexture bottomTexture = StarMadePlus.getInstance().textureMap.get(bottomName);
+                StarLoaderTexture sidesTexture = StarMadePlus.getInstance().textureMap.get(sidesName);
 
                 textureIDs[0] = (short) sidesTexture.getTextureId();
                 textureIDs[1] = (short) sidesTexture.getTextureId();
@@ -73,9 +73,9 @@ public abstract class BlockElement {
                 String sidesHorizontalName = name.toLowerCase().replaceAll(" ", "_") + "_sides_horizontal";
                 String sidesVerticalName = name.toLowerCase().replaceAll(" ", "_") + "_sides_vertical";
 
-                StarLoaderTexture frontTexture = StarMadePlus.getInstance().textures.get(frontName);
-                StarLoaderTexture sidesHorizontalTexture = StarMadePlus.getInstance().textures.get(sidesHorizontalName);
-                StarLoaderTexture sidesVerticalTexture = StarMadePlus.getInstance().textures.get(sidesVerticalName);
+                StarLoaderTexture frontTexture = StarMadePlus.getInstance().textureMap.get(frontName);
+                StarLoaderTexture sidesHorizontalTexture = StarMadePlus.getInstance().textureMap.get(sidesHorizontalName);
+                StarLoaderTexture sidesVerticalTexture = StarMadePlus.getInstance().textureMap.get(sidesVerticalName);
 
                 textureIDs[0] = (short) frontTexture.getTextureId();
                 textureIDs[1] = (short) sidesHorizontalTexture.getTextureId();
@@ -94,11 +94,11 @@ public abstract class BlockElement {
                 String bottomName = name.toLowerCase().replaceAll(" ", "_") + "_bottom";
                 String sidesName = name.toLowerCase().replaceAll(" ", "_") + "_sides";
 
-                StarLoaderTexture frontTexture = StarMadePlus.getInstance().textures.get(frontName);
-                StarLoaderTexture backTexture = StarMadePlus.getInstance().textures.get(backName);
-                StarLoaderTexture topTexture = StarMadePlus.getInstance().textures.get(topName);
-                StarLoaderTexture bottomTexture = StarMadePlus.getInstance().textures.get(bottomName);
-                StarLoaderTexture sidesTexture = StarMadePlus.getInstance().textures.get(sidesName);
+                StarLoaderTexture frontTexture = StarMadePlus.getInstance().textureMap.get(frontName);
+                StarLoaderTexture backTexture = StarMadePlus.getInstance().textureMap.get(backName);
+                StarLoaderTexture topTexture = StarMadePlus.getInstance().textureMap.get(topName);
+                StarLoaderTexture bottomTexture = StarMadePlus.getInstance().textureMap.get(bottomName);
+                StarLoaderTexture sidesTexture = StarMadePlus.getInstance().textureMap.get(sidesName);
 
                 textureIDs[0] = (short) backTexture.getTextureId();
                 textureIDs[1] = (short) frontTexture.getTextureId();
@@ -116,4 +116,6 @@ public abstract class BlockElement {
     public short getId() {
         return blockInfo.getId();
     }
+
+    public abstract void initialize();
 }

@@ -1,6 +1,5 @@
 package thederpgamer.starmadeplus;
 
-import api.DebugFile;
 import api.common.GameClient;
 import api.common.GameCommon;
 import api.config.BlockConfig;
@@ -18,6 +17,7 @@ import api.mod.config.FileConfiguration;
 import api.mod.config.PersistentObjectUtil;
 import api.utils.textures.StarLoaderTexture;
 import org.schema.game.common.data.element.ElementKeyMap;
+import org.schema.schine.graphicsengine.forms.Sprite;
 import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.starmadeplus.blocks.BlockManager;
 import thederpgamer.starmadeplus.blocks.decor.HoloTable;
@@ -53,7 +53,6 @@ import org.schema.game.common.controller.elements.*;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.SendableGameState;
 import org.schema.game.common.data.element.ElementCollection;
-import org.schema.game.common.data.element.ElementCollectionMesh;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.world.Segment;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
@@ -64,14 +63,8 @@ import org.schema.schine.graphicsengine.core.GLFrame;
 import org.schema.schine.graphicsengine.core.ResourceException;
 import org.schema.schine.graphicsengine.forms.font.FontLibrary;
 import javax.imageio.ImageIO;
-import javax.vecmath.Vector3f;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -87,19 +80,16 @@ public class StarMadePlus extends StarMod {
 
     public enum ImageFilterMode {BLACKLIST, WHITELIST}
 
-    public enum LogType {DEBUG, INFO, WARNING, ERROR, SEVERE}
-
     public ElementGroupMeshDrawer meshDrawer;
-    public HashMap<String, StarLoaderTexture> textures = new HashMap<>();
+    public HashMap<String, Sprite> spriteMap = new HashMap<>();
+    public HashMap<String, StarLoaderTexture> textureMap = new HashMap<>();
     private final String disclaimerMessage =
             "By pressing the ACCEPT button, you hereby acknowledge any and all responsibility for the images you\n" +
                     "post and that the creators of StarMadePlus, the StarLoader team, Schine, the Server or its owners,\n" +
                     "or any other person/entity that is not you cannot be held liable for anything you post.";
 
     //Logs
-    private final String logPath = "moddata/StarMadePlus/logs/";
-    private File adminLogFile;
-    private File imageLogFile;
+    private final String logPath = "moddata/StarMadePlus/logs";;
 
     //Config
     private final String[] defaultConfig = {
@@ -120,17 +110,20 @@ public class StarMadePlus extends StarMod {
     public int tacticalMapMaxViewDistance = 3;
 
     //Resources
+    private final String[] spriteNames = new String[] {
+            "transparent"
+    };
     private final String[] textureNames = new String[] {
-            "hidden_rail_spinner_clockwise_sides",
-            "hidden_rail_spinner_clockwise_top",
-            "hidden_rail_spinner_counter_clockwise_sides",
-            "hidden_rail_spinner_counter_clockwise_top",
-            "rail_spinner_clockwise_bottom",
-            "rail_spinner_clockwise_sides",
-            "rail_spinner_clockwise_top",
-            "rail_spinner_counter_clockwise_bottom",
-            "rail_spinner_counter_clockwise_sides",
-            "rail_spinner_counter_clockwise_top"
+            "hidden_rail_spinner_clock_wise_sides",
+            "hidden_rail_spinner_clock_wise_top",
+            "hidden_rail_spinner_counter_clock_wise_sides",
+            "hidden_rail_spinner_counter_clock_wise_top",
+            "rail_spinner_clock_wise_bottom",
+            "rail_spinner_clock_wise_sides",
+            "rail_spinner_clock_wise_top",
+            "rail_spinner_counter_clock_wise_bottom",
+            "rail_spinner_counter_clock_wise_sides",
+            "rail_spinner_counter_clock_wise_top"
     };
     private final String[] modelNames = new String[] {
             "display_screen",
@@ -141,24 +134,41 @@ public class StarMadePlus extends StarMod {
     public void onEnable() {
         instance = this;
         initConfig();
-        createLogs();
         registerFastListeners();
         registerListeners();
     }
 
     @Override
     public void onResourceLoad(ResourceLoader loader) {
-        for(String textureName : textureNames) {
+        for(String spriteName :  spriteNames) {
             try {
-                textures.put(textureName, StarLoaderTexture.newBlockTexture(ImageIO.read(getJarResource("thederpgamer/starmadeplus/resources/textures/blocks/" + textureName + ".png"))));
-            } catch(IOException exception) {
+                spriteMap.put(spriteName, StarLoaderTexture.newSprite(ImageIO.read(getJarResource("thederpgamer/starmadeplus/resources/sprites/" + spriteName + ".png")), this, spriteName));
+            } catch (IOException exception) {
+                try {
+                    spriteMap.put(spriteName, StarLoaderTexture.newSprite(ImageIO.read(getJarResource("thederpgamer/starmadeplus/resources/sprites/missing_sprite.png")), this, spriteName));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 exception.printStackTrace();
             }
         }
 
-        for(String model : modelNames) {
+        for(String textureName : textureNames) {
             try {
-                loader.getMeshLoader().loadModMesh(this, model, getJarResource("thederpgamer/starmadeplus/resources/models/blocks/" + model + ".zip"), null);
+                textureMap.put(textureName, StarLoaderTexture.newBlockTexture(ImageIO.read(getJarResource("thederpgamer/starmadeplus/resources/textures/blocks/" + textureName + ".png"))));
+            } catch(IOException exception) {
+                try {
+                    textureMap.put(textureName, StarLoaderTexture.newBlockTexture(ImageIO.read(getJarResource("thederpgamer/starmadeplus/resources/textures/missing_texture.png"))));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                exception.printStackTrace();
+            }
+        }
+
+        for(String modelName : modelNames) {
+            try {
+                loader.getMeshLoader().loadModMesh(this, modelName, getJarResource("thederpgamer/starmadeplus/resources/models/blocks/" + modelName + ".zip"), null);
             } catch(ResourceException | IOException e) {
                 e.printStackTrace();
             }
@@ -183,13 +193,15 @@ public class StarMadePlus extends StarMod {
         BlockManager.addBlock(new HiddenRailSpinnerCounterClockwise());
 
         //Systems
-        BlockManager.addBlock(new StellarLifterController());
+        //BlockManager.addBlock(new StellarLifterController());
+
+        //Resources
+        BlockManager.addBlock(new PhotonShard());
 
         //Factories
         new CrystallizerController();
 
-        //Resources
-        BlockManager.addBlock(new PhotonShard());
+        BlockManager.initializeBlocks();
     }
 
     private void registerFastListeners() {
@@ -226,7 +238,6 @@ public class StarMadePlus extends StarMod {
                             if(playerData.playerName.equals(player.getName()) && playerData.acceptedDisclaimer) { //Player has already accepted disclaimer
                                 acceptedDisclaimer = true;
                                 String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
-                                logImage(text, event.getPlayer());
                                 break;
                             }
                         }
@@ -252,7 +263,6 @@ public class StarMadePlus extends StarMod {
                                         }
                                     }
                                     String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
-                                    logImage(text, event.getPlayer());
                                 }
 
                                 @Override
@@ -290,7 +300,6 @@ public class StarMadePlus extends StarMod {
                         PlayerData playerData = ServerDatabase.getPlayerData(event.getPlayer().getName());
                         if(playerData.acceptedDisclaimer) {
                             String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
-                            logImage(text, event.getPlayer());
                         } else {
                             PlayerOkCancelInput input = new PlayerOkCancelInput("Disclaimer Popup", GameClient.getClientState(), "Accept Disclaimer", disclaimerMessage) {
                                 @Override
@@ -305,7 +314,6 @@ public class StarMadePlus extends StarMod {
                                     ServerDatabase.updatePlayerData(playerData);
 
                                     String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
-                                    logImage(text, event.getPlayer());
                                 }
 
                                 @Override
@@ -341,7 +349,6 @@ public class StarMadePlus extends StarMod {
                         final PlayerInteractionControlManager cm = event.getControlManager();
 
                         String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
-                        logImage(text, event.getPlayer());
 
                         if (text == null) {
                             text = "";
@@ -488,61 +495,6 @@ public class StarMadePlus extends StarMod {
         this.imageFilterMode = ImageFilterMode.valueOf(config.getString("image-filter-mode").toUpperCase());
         this.imageFilter = config.getList("image-filter");
         this.tacticalMapMaxViewDistance = config.getInt("tactical-map-max-view-distance");
-    }
-
-    private void createLogs() {
-        Date dateTime = new Date();
-        File logFolder = new File(logPath);
-        try {
-            if (!logFolder.exists()) logFolder.mkdirs();
-            (adminLogFile = new File(logPath + "adminLog_" + dateTime.toString() + ".log")).createNewFile();
-            (imageLogFile = new File(logPath + "imageLog_" + dateTime.toString() + ".log")).createNewFile();
-        } catch (Exception e) {
-            e.printStackTrace();
-            DebugFile.logError(new Throwable("Exception encountered while trying to create log files in " + logPath + "!"), this);
-        }
-    }
-
-    public void logAdmin(String message, LogType logType) {
-        if (GameCommon.isDedicatedServer() || GameCommon.isOnSinglePlayer()) {
-            try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(adminLogFile, true));
-                switch (logType) {
-                    case DEBUG:
-                        if (debugMode) writer.append("\n[DEBUG]: ").append(message);
-                        break;
-                    case INFO:
-                        writer.append("\n[INFO]: ").append(message);
-                        break;
-                    case WARNING:
-                        writer.append("\n[WARNING]: ").append(message);
-                        break;
-                    case ERROR:
-                        writer.append("\n[ERROR]: ").append(message);
-                        break;
-                    case SEVERE:
-                        writer.append("\n[SEVERE]: ").append(message);
-                        break;
-                }
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-                DebugFile.logError(new Throwable("Exception encountered while trying to write to admin log!"), this);
-            }
-        }
-    }
-
-    public void logImage(String text, PlayerState player) {
-        if (GameCommon.isDedicatedServer() || GameCommon.isOnSinglePlayer()) {
-            try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(imageLogFile, true));
-                writer.append(player.getName()).append(" posted an image ").append(text).append("on a display module.");
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-                DebugFile.logError(new Throwable("Exception encountered while trying to write to image log!"), this);
-            }
-        }
     }
 
     public static StarMadePlus getInstance() {

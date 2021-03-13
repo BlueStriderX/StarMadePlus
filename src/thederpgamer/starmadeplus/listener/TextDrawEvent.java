@@ -1,7 +1,6 @@
 package thederpgamer.starmadeplus.listener;
 
 import api.listener.fastevents.TextBoxDrawListener;
-import api.utils.textures.StarLoaderTexture;
 import com.bulletphysics.linearmath.Transform;
 import thederpgamer.starmadeplus.StarMadePlus;
 import thederpgamer.starmadeplus.image.ImageManager;
@@ -11,7 +10,7 @@ import org.schema.game.client.view.SegmentDrawer;
 import org.schema.game.client.view.textbox.AbstractTextBox;
 import org.schema.schine.graphicsengine.core.Controller;
 import org.schema.schine.graphicsengine.forms.Sprite;
-import javax.imageio.ImageIO;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 
@@ -37,11 +36,7 @@ public class TextDrawEvent implements TextBoxDrawListener {
     public void preDrawBackground(SegmentDrawer.TextBoxSeg seg, AbstractTextBox abstractTextBox) {
         for (SegmentDrawer.TextBoxSeg.TextBoxElement textBoxElement : seg.v) {
             if (textBoxElement.rawText.contains("<img>")) {
-                try {
-                    abstractTextBox.getBg().setSprite(StarLoaderTexture.newSprite(ImageIO.read(StarMadePlus.class.getResourceAsStream("particletextures/transparent.png")), StarMadePlus.getInstance(), "transparent"));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                abstractTextBox.getBg().setSprite(StarMadePlus.getInstance().spriteMap.get("transparent"));
                 String str = StringUtils.substringBetween(textBoxElement.rawText, "<img>", "</img>");
                 String[] args = str.split(",");
                 String src = null;

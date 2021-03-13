@@ -10,6 +10,10 @@ public class StellarLifterController extends BlockElement {
 
     public StellarLifterController() {
         super("Stellar Lifter Controller", BlockManager.TextureType.COMPUTER);
+    }
+
+    @Override
+    public void initialize() {
         blockInfo.setInRecipe(true);
         blockInfo.canActivate = ElementKeyMap.getInfo(ElementKeyMap.TRACTOR_BEAM_COMPUTER).canActivate;
         blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TRACTOR_BEAM_COMPUTER).price * 5);
