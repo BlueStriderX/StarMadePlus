@@ -16,8 +16,8 @@ public class ElementGroup {
     private short id;
     private int orientationInt;
 
-    public ElementGroup(ArrayList<BlockSegment> blockList) {
-        this.id = blockList.get(0).getId();
+    public ElementGroup(short id, ArrayList<BlockSegment> blockList) {
+        this.id = id;
         this.orientationInt = blockList.get(0).getOrientation();
         this.blocks = new ArrayList<>();
         for(BlockSegment block : blockList) {
@@ -105,7 +105,7 @@ public class ElementGroup {
         ArrayList<BlockSegment> connections = new ArrayList<>();
         for(BlockSegment block : blocks) {
             for(short id : ElementKeyMap.getInfo(blockSegment.getId()).controlling) {
-                PositionControl control = block.getEntity().getControlElementMap().getDirectControlledElements(id, block.getPositionInt());
+                PositionControl control = block.getEntity().getControlElementMap().getControlledElements(id, block.getPositionInt());
                 if(control != null && control.getControlMap() != null && control.getControlMap().size() > 0) {
                     LongIterator iterator = control.getControlMap().iterator();
                     while(iterator.hasNext()) {
@@ -118,7 +118,11 @@ public class ElementGroup {
     }
 
     public Orientation getOrientation() {
-        return Orientation.values()[orientationInt];
+        if(orientationInt >= Orientation.values().length) {
+            return Orientation.FRONT;
+        } else {
+            return Orientation.values()[orientationInt];
+        }
     }
 
     public SegmentController getEntity() {

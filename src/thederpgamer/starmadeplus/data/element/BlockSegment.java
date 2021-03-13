@@ -58,25 +58,26 @@ public class BlockSegment implements Serializable {
         return ElementKeyMap.getInfo(id);
     }
 
-    public BlockSegment[] getAdjacentBlocks() {
+    public BlockSegment[] getAdjacentBlocks(SegmentController entity) {
         ArrayList<BlockSegment> elementList = new ArrayList<>();
-        SegmentController entity = getEntity();
         for(Vector3i direction : Element.DIRECTIONSi) {
             Vector3i adjacentPos = getPositionInt();
             adjacentPos.add(direction);
-            if(entity.getSegmentBuffer().getPointUnsave(adjacentPos) != null) {
+            try {
                 elementList.add(BlockSegment.fromSegmentPiece(entity.getSegmentBuffer().getPointUnsave(adjacentPos)));
+            } catch (NullPointerException exception) {
+                exception.printStackTrace();
             }
         }
         return elementList.toArray(new BlockSegment[6]);
     }
 
-    public BlockSegment[] getMatchingAdjacent() {
+    public BlockSegment[] getMatchingAdjacent(SegmentController entity) {
         ArrayList<BlockSegment> blocks = new ArrayList<>();
-        BlockSegment[] adjacent = getAdjacentBlocks();
+        BlockSegment[] adjacent = getAdjacentBlocks(entity);
         if(adjacent.length > 0) {
             for(BlockSegment b : adjacent) {
-                if(b.getId() == getId()) blocks.addAll(Arrays.asList(getMatchingAdjacent()));
+                if(b.getId() == getId() && b.getPositionInt() != getPositionInt() && !blocks.contains(b)) blocks.addAll(Arrays.asList(b.getMatchingAdjacent(entity)));
             }
         }
 

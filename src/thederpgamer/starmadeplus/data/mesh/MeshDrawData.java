@@ -1,6 +1,7 @@
 package thederpgamer.starmadeplus.data.mesh;
 
 import org.schema.common.util.linAlg.Vector3b;
+import org.schema.game.common.data.element.ElementCollectionMesh;
 import thederpgamer.starmadeplus.data.element.ElementGroup;
 import org.schema.common.util.linAlg.Vector3i;
 import java.util.UUID;
@@ -10,6 +11,7 @@ public class MeshDrawData {
     private String meshId;
     private int[] drawMin;
     private int[] drawMax;
+    private ElementCollectionMesh mesh;
 
     public MeshDrawData(ElementGroup elementGroup) {
         meshId = UUID.randomUUID().toString();
@@ -60,5 +62,13 @@ public class MeshDrawData {
 
     public Vector3i getDrawMax() {
         return new Vector3i(drawMax[0], drawMax[1], drawMax[2]);
+    }
+
+    public ElementCollectionMesh getMesh() {
+        return mesh;
+    }
+
+    public void setMesh(ElementCollectionMesh mesh) {
+        this.mesh = mesh;
     }
 }

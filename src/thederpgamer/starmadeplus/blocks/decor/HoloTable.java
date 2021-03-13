@@ -19,6 +19,13 @@ public class HoloTable extends BlockElement {
         blockInfo.canActivate = true;
         blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price * 10);
         blockInfo.setShoppable(true);
+        blockInfo.controlling.add(ElementKeyMap.REACTOR_MAIN);
+        blockInfo.controlling.add(ElementKeyMap.REACTOR_STABILIZER);
+        blockInfo.controlling.add(ElementKeyMap.SHIELD_CAP_ID);
+        blockInfo.controlling.add(ElementKeyMap.SHIELD_REGEN_ID);
+        blockInfo.controlling.add(ElementKeyMap.WEAPON_CONTROLLER_ID);
+        blockInfo.controlling.add(ElementKeyMap.DAMAGE_BEAM_COMPUTER);
+        blockInfo.controlling.add(ElementKeyMap.MISSILE_DUMB_CONTROLLER_ID);
 
         BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(),
                 new FactoryResource(1, (short) 975),

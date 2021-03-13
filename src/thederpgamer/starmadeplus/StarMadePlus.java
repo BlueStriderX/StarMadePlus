@@ -31,7 +31,6 @@ import thederpgamer.starmadeplus.blocks.rails.HiddenRailSpinnerCounterClockwise;
 import thederpgamer.starmadeplus.blocks.rails.RailSpinnerClockwise;
 import thederpgamer.starmadeplus.blocks.rails.RailSpinnerCounterClockwise;
 import thederpgamer.starmadeplus.blocks.resources.PhotonShard;
-import thederpgamer.starmadeplus.blocks.systems.StellarLifterController;
 import thederpgamer.starmadeplus.data.element.BlockSegment;
 import thederpgamer.starmadeplus.data.element.ElementGroup;
 import thederpgamer.starmadeplus.data.mesh.MeshDrawData;
@@ -53,7 +52,6 @@ import org.schema.game.common.controller.elements.*;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.SendableGameState;
 import org.schema.game.common.data.element.ElementCollection;
-import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.world.Segment;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
 import org.schema.game.network.objects.remote.RemoteTextBlockPair;
@@ -87,9 +85,6 @@ public class StarMadePlus extends StarMod {
             "By pressing the ACCEPT button, you hereby acknowledge any and all responsibility for the images you\n" +
                     "post and that the creators of StarMadePlus, the StarLoader team, Schine, the Server or its owners,\n" +
                     "or any other person/entity that is not you cannot be held liable for anything you post.";
-
-    //Logs
-    private final String logPath = "moddata/StarMadePlus/logs";;
 
     //Config
     private final String[] defaultConfig = {
@@ -140,7 +135,7 @@ public class StarMadePlus extends StarMod {
 
     @Override
     public void onResourceLoad(ResourceLoader loader) {
-        for(String spriteName :  spriteNames) {
+        for(String spriteName : spriteNames) {
             try {
                 spriteMap.put(spriteName, StarLoaderTexture.newSprite(ImageIO.read(getJarResource("thederpgamer/starmadeplus/resources/sprites/" + spriteName + ".png")), this, spriteName));
             } catch (IOException exception) {
@@ -228,21 +223,10 @@ public class StarMadePlus extends StarMod {
             @Override
             public void onEvent(final SegmentPieceActivateByPlayer event) {
                 final SegmentPiece piece = event.getSegmentPiece();
-                if (GameCommon.isDedicatedServer() || GameCommon.isOnSinglePlayer()) {
-                    if (piece.getType() == ElementKeyMap.TEXT_BOX) {
-                        final PlayerState player = event.getPlayer();
-                        ArrayList<Object> playerList = PersistentObjectUtil.getObjects(StarMadePlus.getInstance().getSkeleton(), PlayerData.class);
-                        boolean acceptedDisclaimer = false;
-                        for(Object object : playerList) {
-                            PlayerData playerData = (PlayerData) object;
-                            if(playerData.playerName.equals(player.getName()) && playerData.acceptedDisclaimer) { //Player has already accepted disclaimer
-                                acceptedDisclaimer = true;
-                                String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
-                                break;
-                            }
-                        }
-
-                        if(!acceptedDisclaimer) { //Player has not accepted disclaimer
+                if(GameCommon.isDedicatedServer() || GameCommon.isOnSinglePlayer()) {
+                    if(piece.getType() == ElementKeyMap.TEXT_BOX) {
+                        final PlayerData playerData = ServerDatabase.getPlayerData(event.getPlayer().getName());
+                        if(!playerData.acceptedDisclaimer) { //Player has not accepted disclaimer
                             PlayerOkCancelInput input = new PlayerOkCancelInput("Disclaimer Popup", GameClient.getClientState(), "Accept Disclaimer", disclaimerMessage) {
                                 @Override
                                 public void onDeactivate() {
@@ -254,7 +238,7 @@ public class StarMadePlus extends StarMod {
                                     ArrayList<Object> dataObjectList = PersistentObjectUtil.getObjects(getSkeleton(), PlayerData.class);
                                     for(Object dataObject : dataObjectList) {
                                         PlayerData pData = (PlayerData) dataObject;
-                                        if(pData.playerName.equals(player.getName())) {
+                                        if(pData.playerName.equals(playerData.playerName)) {
                                             pData.acceptedDisclaimer = true;
                                             PersistentObjectUtil.removeObject(getSkeleton(), pData);
                                             PersistentObjectUtil.addObject(getSkeleton(), pData);
@@ -262,7 +246,6 @@ public class StarMadePlus extends StarMod {
                                             break;
                                         }
                                     }
-                                    String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
                                 }
 
                                 @Override
@@ -295,12 +278,9 @@ public class StarMadePlus extends StarMod {
                             input.activate();
                         }
 
-                    } else if (piece.getType() == Objects.requireNonNull(BlockManager.getFromName("Display Screen")).blockInfo.getId()) {
-
+                    } else if(piece.getType() == Objects.requireNonNull(BlockManager.getFromName("Display Screen")).blockInfo.getId()) {
                         PlayerData playerData = ServerDatabase.getPlayerData(event.getPlayer().getName());
-                        if(playerData.acceptedDisclaimer) {
-                            String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
-                        } else {
+                        if(!playerData.acceptedDisclaimer) {
                             PlayerOkCancelInput input = new PlayerOkCancelInput("Disclaimer Popup", GameClient.getClientState(), "Accept Disclaimer", disclaimerMessage) {
                                 @Override
                                 public void onDeactivate() {
@@ -312,8 +292,6 @@ public class StarMadePlus extends StarMod {
                                     PlayerData playerData = ServerDatabase.getPlayerData(event.getPlayer().getName());
                                     playerData.acceptedDisclaimer = true;
                                     ServerDatabase.updatePlayerData(playerData);
-
-                                    String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
                                 }
 
                                 @Override
@@ -402,6 +380,33 @@ public class StarMadePlus extends StarMod {
                         t.getTextInput().setAllowEmptyEntry(true);
                         t.getInputPanel().onInit();
                         t.activate();
+                    } else if(event.getSegmentPiece().getType() == Objects.requireNonNull(BlockManager.getFromName("Holo Table")).getId()) {
+                        BlockSegment block = BlockSegment.fromEvent(event);
+                        ElementGroup elementGroup = MultiblockUtils.getElementGroup(block, MultiblockUtils.MultiblockType.SQUARE_FLAT);
+                        if(elementGroup != null) {
+                            ArrayList<BlockSegment> connections = elementGroup.getConnections(block);
+                            if(connections != null && connections.size() > 0) {
+                                ArrayList<ElementCollection<?, ?, ?>> collections = new ArrayList<>();
+                                SegmentController segmentController = block.getEntity();
+                                ManagerContainer<?> manager = null;
+                                if(segmentController.getType().equals(SimpleTransformableSendableObject.EntityType.SHIP)) {
+                                    manager = new ShipManagerContainer(segmentController.getState(), (Ship) segmentController);
+                                } else if(segmentController.getType().equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION)) {
+                                    manager = new SpaceStationManagerContainer(segmentController.getState(), (SpaceStation) segmentController);
+                                }
+
+                                if(manager != null) {
+                                    for (BlockSegment connection : connections) {
+                                        ElementCollection<?, ?, ?> collection = MultiblockUtils.getElementCollection(manager, connection);
+                                        if(collection != null && !collections.contains(collection)) collections.add(collection);
+                                    }
+
+                                    for(ElementCollection<?, ?, ?> collection : collections) {
+                                        meshDrawer.addMesh(collection, new MeshDrawData(elementGroup));
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -410,53 +415,9 @@ public class StarMadePlus extends StarMod {
         StarLoader.registerListener(SegmentPieceAddEvent.class, new Listener<SegmentPieceAddEvent>() {
             @Override
             public void onEvent(SegmentPieceAddEvent event) {
-                BlockSegment blockElement = BlockSegment.fromEvent(event);
-                if(blockElement.getId() == Objects.requireNonNull(BlockManager.getFromName("Holo Table")).getId()) {
-                    ElementGroup elementGroup = MultiblockUtils.getElementGroup(blockElement, MultiblockUtils.MultiblockType.SQUARE_FLAT);
-                    if(elementGroup != null) {
-                        ArrayList<BlockSegment> connections = elementGroup.getConnections(blockElement);
-                        if(connections != null && connections.size() > 0) {
-                            ArrayList<ElementCollection> collections = new ArrayList<>();
-                            SegmentController segmentController = blockElement.getEntity();
-                            ManagerContainer manager = null;
-                            if(segmentController.getType().equals(SimpleTransformableSendableObject.EntityType.SHIP)) {
-                                manager = new ShipManagerContainer(segmentController.getState(), (Ship) segmentController);
-                            } else if(segmentController.getType().equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION)) {
-                                manager = new SpaceStationManagerContainer(segmentController.getState(), (SpaceStation) segmentController);
-                            }
-
-                            if(manager != null) {
-                                for (BlockSegment connection : connections) {
-                                    ElementCollection collection = null;
-                                    if(connection.getId() == ElementKeyMap.SHIELD_CAP_ID || connection.getId() == ElementKeyMap.SHIELD_REGEN_ID) {
-                                        ShieldAddOn shieldAddon = ((ShieldContainerInterface) segmentController).getShieldAddOn();
-                                        if(shieldAddon != null && shieldAddon.getShieldLocalAddOn() != null) {
-                                            if(connection.getId() == ElementKeyMap.SHIELD_CAP_ID) {
-                                                collection = shieldAddon.sc.getShieldCapacityManager().getInstance();
-                                            } else if(connection.getId() == ElementKeyMap.SHIELD_REGEN_ID) {
-                                                collection = shieldAddon.sc.getShieldRegenManager().getInstance();
-                                            }
-                                        }
-                                    } else if(connection.getId() == ElementKeyMap.REACTOR_MAIN) {
-                                        collection = manager.getMainReactor().getInstance();
-                                    } else if(connection.getId() == ElementKeyMap.REACTOR_STABILIZER) {
-                                        collection = manager.getStabilizer().getInstance();
-                                    }
-                                    if(collection != null && !collections.contains(collection)) {
-                                        collections.add(collection);
-                                    }
-                                }
-
-                                for(ElementCollection collection : collections) {
-                                    MeshDrawData drawData = new MeshDrawData(elementGroup);
-                                    meshDrawer.addMesh(drawData, collection);
-                                }
-                            }
-                        }
-                    }
-                } else if(blockElement.getId() == Objects.requireNonNull(BlockManager.getFromName("Display Screen")).blockInfo.getId()) {
-                    long indexAndOrientation = ElementCollection.getIndex4(event.getAbsIndex(), event.getOrientation());
-                    event.getSegmentController().getTextBlocks().add(indexAndOrientation);
+                BlockSegment block = BlockSegment.fromEvent(event);
+                if(block.getId() == Objects.requireNonNull(BlockManager.getFromName("Display Screen")).blockInfo.getId()) {
+                    event.getSegment().getSegmentController().getTextBlocks().add(ElementCollection.getIndex4(event.getAbsIndex(), event.getOrientation()));
                 }
             }
         }, this);
@@ -464,7 +425,7 @@ public class StarMadePlus extends StarMod {
         StarLoader.registerListener(SegmentPieceRemoveEvent.class, new Listener<SegmentPieceRemoveEvent>() {
             @Override
             public void onEvent(SegmentPieceRemoveEvent event) {
-                if (event.getType() == Objects.requireNonNull(BlockManager.getFromName("Display Screen")).blockInfo.getId()) {
+                if(event.getType() == Objects.requireNonNull(BlockManager.getFromName("Display Screen")).blockInfo.getId()) {
                     Segment segment = event.getSegment();
                     long absoluteIndex = segment.getAbsoluteIndex(event.getX(), event.getY(), event.getZ());
                     long indexAndOrientation = ElementCollection.getIndex4(absoluteIndex, event.getOrientation());
@@ -477,7 +438,7 @@ public class StarMadePlus extends StarMod {
         StarLoader.registerListener(SegmentPieceAddByMetadataEvent.class, new Listener<SegmentPieceAddByMetadataEvent>() {
             @Override
             public void onEvent(SegmentPieceAddByMetadataEvent event) {
-                if (event.getType() == Objects.requireNonNull(BlockManager.getFromName("Display Screen")).blockInfo.getId()) {
+                if(event.getType() == Objects.requireNonNull(BlockManager.getFromName("Display Screen")).blockInfo.getId()) {
                     event.getSegment().getSegmentController().getTextBlocks().add(event.getIndexAndOrientation());
                 }
             }

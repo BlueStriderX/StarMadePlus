@@ -1,8 +1,6 @@
 package thederpgamer.starmadeplus.utils;
 
-import api.common.GameClient;
 import api.utils.draw.ModWorldDrawer;
-import com.bulletphysics.linearmath.Transform;
 import org.schema.game.common.data.element.ElementCollection;
 import org.schema.game.common.data.element.ElementCollectionMesh;
 import org.schema.schine.graphicsengine.core.Timer;
@@ -14,31 +12,35 @@ import java.util.HashMap;
 
 public class ElementGroupMeshDrawer extends ModWorldDrawer {
 
-    public HashMap<ElementCollection, HashMap<MeshDrawData, ElementCollectionMesh>> meshMap = new HashMap<>();
+    public HashMap<ElementCollection<?, ?, ?>, MeshDrawData> meshMap = new HashMap<>();
 
-    public void addMesh(MeshDrawData drawData, ElementCollection elementCollection) {
-        HashMap<MeshDrawData, ElementCollectionMesh> meshes;
-        if(meshMap.containsKey(elementCollection)) {
-            meshes = meshMap.get(elementCollection);
-        } else {
-            meshes = new HashMap<>();
-        }
-        meshes.put(drawData, getDrawLocation(drawData, elementCollection));
-        meshMap.put(elementCollection, meshes);
+    public void addMesh(ElementCollection<?, ?, ?> elementCollection, MeshDrawData drawData) {
+        if(!meshMap.containsValue(drawData)) meshMap.put(elementCollection, drawData);
     }
 
     private ArrayList<ElementCollectionMesh> getMeshList() {
         ArrayList<ElementCollectionMesh> meshList = new ArrayList<>();
-        for(HashMap<MeshDrawData, ElementCollectionMesh> meshes : meshMap.values()) {
-            meshList.addAll(meshes.values());
+        for(MeshDrawData drawData : meshMap.values()) {
+            if(drawData.getMesh() != null) meshList.add(drawData.getMesh());
         }
         return meshList;
     }
 
     @Override
     public void update(Timer timer) {
-        for(ElementCollectionMesh mesh : getMeshList()) {
-            if(mesh.isVisibleFrustum(getClientTransform())) mesh.draw();
+        for(ElementCollection<?, ?, ?> elementCollection : meshMap.keySet()) {
+            if(meshMap.get(elementCollection).getMesh() == null) {
+                meshMap.get(elementCollection).setMesh(getDrawLocation(timer.currentTime, elementCollection, meshMap.get(elementCollection)));
+            }
+            ElementCollectionMesh mesh = meshMap.get(elementCollection).getMesh();
+            if(mesh != null) {
+                if(mesh.isVisibleFrustum(elementCollection.getSegmentController().getWorldTransformOnClient())) {
+                    mesh.markDraw();
+                    mesh.draw();
+                } else {
+                    mesh.clear();
+                }
+            }
         }
     }
 
@@ -57,11 +59,13 @@ public class ElementGroupMeshDrawer extends ModWorldDrawer {
 
     }
 
-    private ElementCollectionMesh getDrawLocation(MeshDrawData drawData, ElementCollection elementCollection) {
-        ElementCollectionMesh mesh = (elementCollection.hasMesh()) ? elementCollection.getMesh() : new ElementCollectionMesh();
+    private ElementCollectionMesh getDrawLocation(long time, ElementCollection<?, ?, ?> elementCollection, MeshDrawData drawData) {
         try {
-            Field minField = mesh.getClass().getDeclaredField("min");
-            Field maxField = mesh.getClass().getDeclaredField("max");
+            elementCollection.calculateMesh(time, true);
+            ElementCollectionMesh mesh = elementCollection.getMesh();
+
+            Field minField = mesh.getClass().getDeclaredField("localMin");
+            Field maxField = mesh.getClass().getDeclaredField("localMax");
             minField.setAccessible(true);
             maxField.setAccessible(true);
 
@@ -73,15 +77,12 @@ public class ElementGroupMeshDrawer extends ModWorldDrawer {
 
             minField.set(mesh, min);
             maxField.set(mesh, max);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
+
+            return mesh;
+        } catch(IllegalAccessException | NoSuchFieldException | NullPointerException e) {
             e.printStackTrace();
         }
-        return mesh;
-    }
 
-    private Transform getClientTransform() {
-        Transform clientTransform = new Transform();
-        GameClient.getClientPlayerState().getWordTransform(clientTransform);
-        return clientTransform;
+        return ElementCollection.getMeshInstance();
     }
 }
