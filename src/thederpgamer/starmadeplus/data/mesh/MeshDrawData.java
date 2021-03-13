@@ -3,10 +3,9 @@ package thederpgamer.starmadeplus.data.mesh;
 import org.schema.common.util.linAlg.Vector3b;
 import thederpgamer.starmadeplus.data.element.ElementGroup;
 import org.schema.common.util.linAlg.Vector3i;
-import java.io.Serializable;
 import java.util.UUID;
 
-public class MeshDrawData implements Serializable {
+public class MeshDrawData {
 
     private String meshId;
     private int[] drawMin;

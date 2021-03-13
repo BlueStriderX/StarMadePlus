@@ -7,10 +7,10 @@ import thederpgamer.starmadeplus.blocks.BlockElement;
 import thederpgamer.starmadeplus.blocks.BlockManager;
 import org.schema.game.common.data.element.FactoryResource;
 
-public class BlueHoloProjector extends BlockElement {
+public class HoloTable extends BlockElement {
 
-    public BlueHoloProjector() {
-        super("Blue Holo Projector", BlockManager.TextureType.MODEL);
+    public HoloTable() {
+        super("Holo Table", BlockManager.TextureType.MODEL);
         blockInfo.setInRecipe(true);
         blockInfo.canActivate = true;
         blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price * 10);
@@ -31,7 +31,7 @@ public class BlueHoloProjector extends BlockElement {
                 new FactoryResource(9, BlockManager.getFromName("Display Screen").getId())
         );
 
-        BlockConfig.assignLod(blockInfo, StarMadePlus.getInstance(), "blue_holo_projector", null);
+        BlockConfig.assignLod(blockInfo, StarMadePlus.getInstance(), "holo_table", null);
         BlockConfig.add(blockInfo);
     }
 }

@@ -9,6 +9,7 @@ import api.listener.events.block.SegmentPieceActivateByPlayer;
 import api.listener.events.block.SegmentPieceAddByMetadataEvent;
 import api.listener.events.block.SegmentPieceAddEvent;
 import api.listener.events.block.SegmentPieceRemoveEvent;
+import api.listener.events.draw.RegisterWorldDrawersEvent;
 import api.listener.events.player.PlayerJoinWorldEvent;
 import api.listener.fastevents.FastListenerCommon;
 import api.mod.StarLoader;
@@ -19,7 +20,7 @@ import api.utils.textures.StarLoaderTexture;
 import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.starmadeplus.blocks.BlockManager;
-import thederpgamer.starmadeplus.blocks.decor.BlueHoloProjector;
+import thederpgamer.starmadeplus.blocks.decor.HoloTable;
 import thederpgamer.starmadeplus.blocks.decor.DisplayScreen;
 import thederpgamer.starmadeplus.blocks.factory.CrystallizerController;
 import thederpgamer.starmadeplus.blocks.multiblocks.deepstorage.DeepStorageComponent;
@@ -38,7 +39,7 @@ import thederpgamer.starmadeplus.data.player.PlayerData;
 import thederpgamer.starmadeplus.data.server.ServerDatabase;
 import thederpgamer.starmadeplus.listener.RailMoveEvent;
 import thederpgamer.starmadeplus.listener.TextDrawEvent;
-import thederpgamer.starmadeplus.utils.ElementGroupMeshUtils;
+import thederpgamer.starmadeplus.utils.ElementGroupMeshDrawer;
 import thederpgamer.starmadeplus.utils.MultiblockUtils;
 import org.schema.game.client.controller.PlayerOkCancelInput;
 import org.schema.game.client.controller.PlayerTextAreaInput;
@@ -88,6 +89,7 @@ public class StarMadePlus extends StarMod {
 
     public enum LogType {DEBUG, INFO, WARNING, ERROR, SEVERE}
 
+    public ElementGroupMeshDrawer meshDrawer;
     public HashMap<String, StarLoaderTexture> textures = new HashMap<>();
     private final String disclaimerMessage =
             "By pressing the ACCEPT button, you hereby acknowledge any and all responsibility for the images you\n" +
@@ -119,18 +121,20 @@ public class StarMadePlus extends StarMod {
 
     //Resources
     private final String[] textureNames = new String[] {
-            //Weapons
-            "plasma_launcher_computer_front",
-            "plasma_launcher_computer_back",
-            "plasma_launcher_computer_top",
-            "plasma_launcher_computer_bottom",
-            "plasma_launcher_computer_sides",
-            "plasma_launcher_barrel_front",
-            "plasma_launcher_barrel_sides_horizontal",
-            "plasma_launcher_barrel_sides_vertical"
+            "hidden_rail_spinner_clockwise_sides",
+            "hidden_rail_spinner_clockwise_top",
+            "hidden_rail_spinner_counter_clockwise_sides",
+            "hidden_rail_spinner_counter_clockwise_top",
+            "rail_spinner_clockwise_bottom",
+            "rail_spinner_clockwise_sides",
+            "rail_spinner_clockwise_top",
+            "rail_spinner_counter_clockwise_bottom",
+            "rail_spinner_counter_clockwise_sides",
+            "rail_spinner_counter_clockwise_top"
     };
     private final String[] modelNames = new String[] {
-            "display_screen"
+            "display_screen",
+            "holo_table"
     };
 
     @Override
@@ -165,9 +169,9 @@ public class StarMadePlus extends StarMod {
     public void onBlockConfigLoad(BlockConfig config) {
         //Decor Blocks
         BlockManager.addBlock(new DisplayScreen());
-        BlockManager.addBlock(new BlueHoloProjector());
+        BlockManager.addBlock(new HoloTable());
 
-        //Multiblocks
+        //Multi-Blocks
         BlockManager.addBlock(new DeepStorageController());
         BlockManager.addBlock(new DeepStorageDisplay());
         BlockManager.addBlock(new DeepStorageComponent());
@@ -194,6 +198,13 @@ public class StarMadePlus extends StarMod {
     }
 
     private void registerListeners() {
+        StarLoader.registerListener(RegisterWorldDrawersEvent.class, new Listener<RegisterWorldDrawersEvent>() {
+            @Override
+            public void onEvent(RegisterWorldDrawersEvent event) {
+                event.getModDrawables().add(meshDrawer = new ElementGroupMeshDrawer());
+            }
+        }, this);
+
         StarLoader.registerListener(PlayerJoinWorldEvent.class, new Listener<PlayerJoinWorldEvent>() {
             @Override
             public void onEvent(PlayerJoinWorldEvent event) {
@@ -398,7 +409,7 @@ public class StarMadePlus extends StarMod {
                     if(elementGroup != null) {
                         ArrayList<BlockSegment> connections = elementGroup.getConnections(blockElement);
                         if(connections != null && connections.size() > 0) {
-                            ArrayList<ElementCollectionMesh> meshes = new ArrayList<>();
+                            ArrayList<ElementCollection> collections = new ArrayList<>();
                             SegmentController segmentController = blockElement.getEntity();
                             ManagerContainer manager = null;
                             if(segmentController.getType().equals(SimpleTransformableSendableObject.EntityType.SHIP)) {
@@ -409,54 +420,29 @@ public class StarMadePlus extends StarMod {
 
                             if(manager != null) {
                                 for (BlockSegment connection : connections) {
-                                    ElementCollectionMesh mesh = null;
+                                    ElementCollection collection = null;
                                     if(connection.getId() == ElementKeyMap.SHIELD_CAP_ID || connection.getId() == ElementKeyMap.SHIELD_REGEN_ID) {
                                         ShieldAddOn shieldAddon = ((ShieldContainerInterface) segmentController).getShieldAddOn();
                                         if(shieldAddon != null && shieldAddon.getShieldLocalAddOn() != null) {
                                             if(connection.getId() == ElementKeyMap.SHIELD_CAP_ID) {
-                                                mesh = shieldAddon.sc.getShieldCapacityManager().getInstance().getMesh();
+                                                collection = shieldAddon.sc.getShieldCapacityManager().getInstance();
                                             } else if(connection.getId() == ElementKeyMap.SHIELD_REGEN_ID) {
-                                                mesh = shieldAddon.sc.getShieldRegenManager().getInstance().getMesh();
+                                                collection = shieldAddon.sc.getShieldRegenManager().getInstance();
                                             }
                                         }
                                     } else if(connection.getId() == ElementKeyMap.REACTOR_MAIN) {
-                                        mesh = manager.getMainReactor().getInstance().getMesh();
+                                        collection = manager.getMainReactor().getInstance();
                                     } else if(connection.getId() == ElementKeyMap.REACTOR_STABILIZER) {
-                                        mesh = manager.getStabilizer().getInstance().getMesh();
+                                        collection = manager.getStabilizer().getInstance();
                                     }
-                                    if(mesh != null && !meshes.contains(mesh)) {
-                                        meshes.add(mesh);
+                                    if(collection != null && !collections.contains(collection)) {
+                                        collections.add(collection);
                                     }
                                 }
 
-                                try {
-                                    for (ElementCollectionMesh mesh : meshes) {
-                                        Field minField = mesh.getClass().getDeclaredField("min");
-                                        Field maxField = mesh.getClass().getDeclaredField("max");
-                                        minField.setAccessible(true);
-                                        maxField.setAccessible(true);
-
-                                        Vector3f min = (Vector3f) minField.get(mesh);
-                                        Vector3f max = (Vector3f) maxField.get(mesh);
-
-                                        MeshDrawData drawData;
-                                        if(ElementGroupMeshUtils.elementGroupMeshes.containsKey(elementGroup)) {
-                                            drawData = ElementGroupMeshUtils.elementGroupMeshes.get(elementGroup);
-                                            ElementGroupMeshUtils.elementGroupMeshes.remove(elementGroup);
-                                        } else {
-                                            drawData = new MeshDrawData(elementGroup);
-                                        }
-
-                                        min.set(drawData.getDrawMin().toVector3f());
-                                        max.set(drawData.getDrawMax().toVector3f());
-                                        minField.set(mesh, min);
-                                        maxField.set(mesh, max);
-                                        ElementGroupMeshUtils.elementGroupMeshes.put(elementGroup, drawData);
-                                        mesh.markDraw();
-                                        mesh.draw();
-                                    }
-                                } catch (NoSuchFieldException | IllegalAccessException e) {
-                                    e.printStackTrace();
+                                for(ElementCollection collection : collections) {
+                                    MeshDrawData drawData = new MeshDrawData(elementGroup);
+                                    meshDrawer.addMesh(drawData, collection);
                                 }
                             }
                         }
