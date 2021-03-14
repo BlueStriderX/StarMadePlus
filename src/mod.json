@@ -2,7 +2,7 @@
   "name": "StarMadePlus",
   "author": "TheDerpGamer",
   "description": "Expands on the vanilla experience while offering new systems and mechanics.",
-  "version": "0.7.6",
+  "version": "0.8.1",
   "starmade_version": "0.202.108",
   "client_mod": false,
   "server_mod": false,
@@ -11,7 +11,7 @@
   "dependencies": [
     -1
   ],
-  "core_mod": false,
-  "requires_class_resize": false,
-  "hard_load_all_classes": false
+  "core_mod": true,
+  "requires_class_resize": true,
+  "hard_load_all_classes": true
 }

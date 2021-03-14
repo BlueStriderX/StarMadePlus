@@ -31,14 +31,13 @@ import thederpgamer.starmadeplus.blocks.rails.HiddenRailSpinnerCounterClockwise;
 import thederpgamer.starmadeplus.blocks.rails.RailSpinnerClockwise;
 import thederpgamer.starmadeplus.blocks.rails.RailSpinnerCounterClockwise;
 import thederpgamer.starmadeplus.blocks.resources.PhotonShard;
+import thederpgamer.starmadeplus.data.drawer.ElementCollectionMeshDrawer;
 import thederpgamer.starmadeplus.data.element.BlockSegment;
-import thederpgamer.starmadeplus.data.element.ElementGroup;
-import thederpgamer.starmadeplus.data.mesh.MeshDrawData;
+import thederpgamer.starmadeplus.data.drawer.MeshDrawData;
 import thederpgamer.starmadeplus.data.player.PlayerData;
 import thederpgamer.starmadeplus.data.server.ServerDatabase;
 import thederpgamer.starmadeplus.listener.RailMoveEvent;
 import thederpgamer.starmadeplus.listener.TextDrawEvent;
-import thederpgamer.starmadeplus.utils.ElementGroupMeshDrawer;
 import thederpgamer.starmadeplus.utils.MultiblockUtils;
 import org.schema.game.client.controller.PlayerOkCancelInput;
 import org.schema.game.client.controller.PlayerTextAreaInput;
@@ -78,7 +77,7 @@ public class StarMadePlus extends StarMod {
 
     public enum ImageFilterMode {BLACKLIST, WHITELIST}
 
-    public ElementGroupMeshDrawer meshDrawer;
+    public HashMap<ElementCollection<?, ?, ?>, MeshDrawData> meshMap = new HashMap<>();
     public HashMap<String, Sprite> spriteMap = new HashMap<>();
     public HashMap<String, StarLoaderTexture> textureMap = new HashMap<>();
     private final String disclaimerMessage =
@@ -205,13 +204,6 @@ public class StarMadePlus extends StarMod {
     }
 
     private void registerListeners() {
-        StarLoader.registerListener(RegisterWorldDrawersEvent.class, new Listener<RegisterWorldDrawersEvent>() {
-            @Override
-            public void onEvent(RegisterWorldDrawersEvent event) {
-                event.getModDrawables().add(meshDrawer = new ElementGroupMeshDrawer());
-            }
-        }, this);
-
         StarLoader.registerListener(PlayerJoinWorldEvent.class, new Listener<PlayerJoinWorldEvent>() {
             @Override
             public void onEvent(PlayerJoinWorldEvent event) {
@@ -382,27 +374,27 @@ public class StarMadePlus extends StarMod {
                         t.activate();
                     } else if(event.getSegmentPiece().getType() == Objects.requireNonNull(BlockManager.getFromName("Holo Table")).getId()) {
                         BlockSegment block = BlockSegment.fromEvent(event);
-                        ElementGroup elementGroup = MultiblockUtils.getElementGroup(block, MultiblockUtils.MultiblockType.SQUARE_FLAT);
-                        if(elementGroup != null) {
-                            ArrayList<BlockSegment> connections = elementGroup.getConnections(block);
-                            if(connections != null && connections.size() > 0) {
-                                ArrayList<ElementCollection<?, ?, ?>> collections = new ArrayList<>();
-                                SegmentController segmentController = block.getEntity();
-                                ManagerContainer<?> manager = null;
-                                if(segmentController.getType().equals(SimpleTransformableSendableObject.EntityType.SHIP)) {
-                                    manager = new ShipManagerContainer(segmentController.getState(), (Ship) segmentController);
-                                } else if(segmentController.getType().equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION)) {
-                                    manager = new SpaceStationManagerContainer(segmentController.getState(), (SpaceStation) segmentController);
+                        BlockSegment[] connections = block.getSlavedBlocks();
+                        if(connections != null && connections.length > 0) {
+                            ArrayList<ElementCollection<?, ?, ?>> collections = new ArrayList<>();
+                            SegmentController segmentController = block.getEntity();
+                            ManagerContainer<?> manager = null;
+                            if(segmentController.getType().equals(SimpleTransformableSendableObject.EntityType.SHIP)) {
+                                manager = new ShipManagerContainer(segmentController.getState(), (Ship) segmentController);
+                            } else if(segmentController.getType().equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION)) {
+                                manager = new SpaceStationManagerContainer(segmentController.getState(), (SpaceStation) segmentController);
+                            }
+
+                            if(manager != null) {
+                                for(BlockSegment connection : connections) {
+                                    ElementCollection<?, ?, ?> collection = MultiblockUtils.getElementCollection(manager, connection);
+                                    if(collection != null && !collections.contains(collection)) collections.add(collection);
                                 }
 
-                                if(manager != null) {
-                                    for (BlockSegment connection : connections) {
-                                        ElementCollection<?, ?, ?> collection = MultiblockUtils.getElementCollection(manager, connection);
-                                        if(collection != null && !collections.contains(collection)) collections.add(collection);
-                                    }
-
-                                    for(ElementCollection<?, ?, ?> collection : collections) {
-                                        meshDrawer.addMesh(collection, new MeshDrawData(elementGroup));
+                                for(ElementCollection<?, ?, ?> elementCollection : collections) {
+                                    MeshDrawData drawData = new MeshDrawData(block, elementCollection.getElementCollectionId().getType(), elementCollection);
+                                    if(!ElementCollectionMeshDrawer.instance.getDrawMap().containsKey(elementCollection)) {
+                                        ElementCollectionMeshDrawer.instance.getDrawMap().put(elementCollection, drawData);
                                     }
                                 }
                             }
@@ -441,6 +433,13 @@ public class StarMadePlus extends StarMod {
                 if(event.getType() == Objects.requireNonNull(BlockManager.getFromName("Display Screen")).blockInfo.getId()) {
                     event.getSegment().getSegmentController().getTextBlocks().add(event.getIndexAndOrientation());
                 }
+            }
+        }, this);
+
+        StarLoader.registerListener(RegisterWorldDrawersEvent.class, new Listener<RegisterWorldDrawersEvent>() {
+            @Override
+            public void onEvent(RegisterWorldDrawersEvent event) {
+                event.getModDrawables().add(new ElementCollectionMeshDrawer());
             }
         }, this);
     }

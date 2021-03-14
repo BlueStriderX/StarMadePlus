@@ -1,7 +1,6 @@
 package thederpgamer.starmadeplus.utils;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import org.schema.common.util.linAlg.Vector3b;
 import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.controller.elements.ShieldAddOn;
 import org.schema.game.common.controller.elements.ShieldContainerInterface;
@@ -14,32 +13,8 @@ import org.schema.game.common.controller.elements.weapon.WeaponElementManager;
 import org.schema.game.common.data.element.ElementCollection;
 import org.schema.game.common.data.element.ElementKeyMap;
 import thederpgamer.starmadeplus.data.element.BlockSegment;
-import thederpgamer.starmadeplus.data.element.ElementGroup;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class MultiblockUtils {
-
-    public enum MultiblockType {SQUARE_FLAT}
-
-    public static ElementGroup getElementGroup(BlockSegment block, MultiblockType type) {
-        ArrayList<BlockSegment> adjacentList = new ArrayList<>(Arrays.asList(block.getMatchingAdjacent(block.getEntity())));
-        adjacentList.add(block);
-        if(!adjacentList.isEmpty()) {
-            ElementGroup elementGroup = new ElementGroup(block.getId(), adjacentList);
-            elementGroup.addBlock(block);
-            if(elementGroup.isSolid()) {
-                if(type.equals(MultiblockType.SQUARE_FLAT)) {
-                    Vector3b min = elementGroup.getMin();
-                    Vector3b max = elementGroup.getMax();
-                    if(min.x == max.x || min.y == max.y || min.z == max.z) {
-                        return elementGroup;
-                    }
-                }
-            }
-        }
-        return new ElementGroup(block.getId(), adjacentList);
-    }
 
     public static ElementCollection<?, ?, ?> getElementCollection(ManagerContainer<?> manager, BlockSegment connection) {
         if(connection.getId() == ElementKeyMap.REACTOR_MAIN) {
@@ -61,7 +36,7 @@ public class MultiblockUtils {
                 if(object instanceof WeaponElementManager) {
                     WeaponElementManager elementManager = (WeaponElementManager) object;
                     for(WeaponCollectionManager collectionManager : elementManager.getCollectionManagers()) {
-                        if(collectionManager.getControllerPos().equals(connection.getPositionInt())) return collectionManager.getInstance();
+                        if(collectionManager.getControllerPos().equals(connection.getPosition())) return collectionManager.getInstance();
                     }
                 }
             }
@@ -71,7 +46,7 @@ public class MultiblockUtils {
                 if(object instanceof DamageBeamElementManager) {
                     DamageBeamElementManager elementManager = (DamageBeamElementManager) object;
                     for(DamageBeamCollectionManager collectionManager : elementManager.getCollectionManagers()) {
-                        if(collectionManager.getControllerPos().equals(connection.getPositionInt())) return collectionManager.getInstance();
+                        if(collectionManager.getControllerPos().equals(connection.getPosition())) return collectionManager.getInstance();
                     }
                 }
             }
@@ -83,7 +58,7 @@ public class MultiblockUtils {
                     for(Object cmObject : elementManager.getCollectionManagers()) {
                         if(cmObject instanceof MissileCollectionManager) {
                             MissileCollectionManager<?, ?, ?> collectionManager = (MissileCollectionManager<?, ?, ?>) cmObject;
-                            if(collectionManager.getControllerPos().equals(connection.getPositionInt())) return collectionManager.getInstance();
+                            if(collectionManager.getControllerPos().equals(connection.getPosition())) return collectionManager.getInstance();
                         }
                     }
                 }
