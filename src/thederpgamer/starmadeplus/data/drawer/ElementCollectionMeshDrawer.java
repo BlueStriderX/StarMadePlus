@@ -9,7 +9,6 @@ import org.schema.schine.graphicsengine.core.Timer;
 import org.schema.schine.graphicsengine.shader.Shader;
 import org.schema.schine.graphicsengine.shader.ShaderLibrary;
 import org.schema.schine.graphicsengine.shader.Shaderable;
-
 import java.nio.FloatBuffer;
 import java.util.HashMap;
 
