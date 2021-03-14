@@ -25,7 +25,6 @@ public class MeshDrawData {
         this.blocks = controller.getSlavedBlocks(connectionType);
         this.elementCollection = elementCollection;
         if((mesh = elementCollection.getMesh()) == null) this.mesh = ElementCollection.getMeshInstance();
-        this.mesh.calculate(elementCollection, 0L, elementCollection.getNeighboringCollectionUnsave());
     }
 
     public BlockSegment getController() {

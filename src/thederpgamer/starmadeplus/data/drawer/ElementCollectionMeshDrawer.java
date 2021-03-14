@@ -38,8 +38,8 @@ public class ElementCollectionMeshDrawer extends ModWorldDrawer implements Shade
 
     @Override
     public void update(Timer timer) {
-        for(MeshDrawData drawData : drawMap.values()) {
-            if(drawData.getMesh().isVisibleFrustum(drawData.getElementCollection().getSegmentController().getWorldTransformOnClient())) {
+        for (MeshDrawData drawData : drawMap.values()) {
+            if (drawData.getMesh() != null && drawData.getElementCollection() != null) {
                 elementCollectionShader.setShaderInterface(this);
                 elementCollectionShader.load();
                 GlUtil.glEnable(3042);
@@ -49,7 +49,7 @@ public class ElementCollectionMeshDrawer extends ModWorldDrawer implements Shade
                 GlUtil.glMultMatrix(drawData.getMeshTransform());
                 GlUtil.scaleModelview(drawData.getMeshScale(), drawData.getMeshScale(), drawData.getMeshScale());
                 drawData.getMesh().markDraw();
-                drawData.getMesh().draw();
+                drawData.getMesh().drawDebug();
                 GlUtil.glPopMatrix();
                 GlUtil.glDisable(3042);
                 elementCollectionShader.unload();
@@ -59,7 +59,7 @@ public class ElementCollectionMeshDrawer extends ModWorldDrawer implements Shade
 
     @Override
     public void cleanUp() {
-        for(MeshDrawData drawData : drawMap.values()) drawData.getMesh().clear();
+        for (MeshDrawData drawData : drawMap.values()) drawData.getMesh().clear();
     }
 
     @Override
@@ -79,12 +79,12 @@ public class ElementCollectionMeshDrawer extends ModWorldDrawer implements Shade
 
     @Override
     public void updateShaderParameters(Shader shader) {
-        if(shader.recompiled) {
+        if (shader.recompiled) {
             GlUtil.updateShaderCubeNormalsBiNormalsAndTangentsBoolean(shader);
             FloatBuffer buffer = GlUtil.getDynamicByteBuffer(72, 0).asFloatBuffer();
             buffer.rewind();
 
-            for(int i = 0; i < CubeMeshQuadsShader13.quadPosMark.length; ++ i) {
+            for (int i = 0; i < CubeMeshQuadsShader13.quadPosMark.length; ++i) {
                 buffer.put(CubeMeshQuadsShader13.quadPosMark[i].x);
                 buffer.put(CubeMeshQuadsShader13.quadPosMark[i].y);
                 buffer.put(CubeMeshQuadsShader13.quadPosMark[i].z);

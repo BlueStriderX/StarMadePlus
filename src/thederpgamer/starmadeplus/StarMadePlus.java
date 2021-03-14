@@ -1,7 +1,6 @@
 package thederpgamer.starmadeplus;
 
 import api.common.GameClient;
-import api.common.GameCommon;
 import api.config.BlockConfig;
 import api.listener.Listener;
 import api.listener.events.block.*;
@@ -56,7 +55,6 @@ import org.schema.schine.common.TextCallback;
 import org.schema.schine.graphicsengine.core.GLFrame;
 import org.schema.schine.graphicsengine.core.ResourceException;
 import org.schema.schine.graphicsengine.forms.font.FontLibrary;
-
 import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -377,8 +375,7 @@ public class StarMadePlus extends StarMod {
                             SendableSegmentProvider ss = ((ClientSegmentProvider) piece.getSegment().getSegmentController().getSegmentProvider()).getSendableSegmentProvider();
 
                             TextBlockPair f = new TextBlockPair();
-
-                            f.block = ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation());
+                            f.block = piece.getTextBlockIndex();
                             f.text = entry;
                             System.err.println("[CLIENT]Text entry:\n\"" + f.text + "\"");
                             ss.getNetworkObject().textBlockResponsesAndChangeRequests.add(new RemoteTextBlockPair(f, false));
@@ -423,12 +420,11 @@ public class StarMadePlus extends StarMod {
                         if (manager != null) {
                             for (BlockSegment connection : connections) {
                                 ElementCollection<?, ?, ?> collection = MultiblockUtils.getElementCollection(manager, connection);
-                                if (collection != null && !collections.contains(collection))
-                                    collections.add(collection);
+                                if (collection != null && !collections.contains(collection)) collections.add(collection);
                             }
 
-                            for (ElementCollection<?, ?, ?> elementCollection : collections) {
-                                MeshDrawData drawData = new MeshDrawData(block, elementCollection.getElementCollectionId().getType(), elementCollection);
+                            for(ElementCollection<?, ?, ?> elementCollection : collections) {
+                                MeshDrawData drawData = new MeshDrawData(block, elementCollection.getClazzId(), elementCollection);
                                 if (!ElementCollectionMeshDrawer.instance.getDrawMap().containsKey(elementCollection)) {
                                     ElementCollectionMeshDrawer.instance.getDrawMap().put(elementCollection, drawData);
                                 }
